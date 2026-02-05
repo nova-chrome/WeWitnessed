@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
 import { PropsWithChildren } from "react";
+import { PWARegister } from "~/components/pwa-register";
 import { cn } from "~/lib/utils";
 import "./globals.css";
 
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
         className={cn(geistSans.variable, geistMono.variable, "antialiased")}
       >
         {children}
+        <PWARegister />
       </body>
     </html>
   );
