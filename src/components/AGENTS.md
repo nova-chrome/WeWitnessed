@@ -103,3 +103,25 @@ export function Card({ className, ...props }) {
   )
 }
 ```
+
+## Lucide Icons Convention
+
+Always import lucide-react icons with the `Icon` suffix:
+
+```tsx
+// ❌ Bad: No suffix
+import { RefreshCw, X, Loader2 } from "lucide-react"
+
+// ✅ Good: Icon suffix
+import { RefreshCwIcon, XIcon, Loader2Icon } from "lucide-react"
+```
+
+Use `size-*` for icon dimensions instead of `h-* w-*`:
+
+```tsx
+// ❌ Bad
+<RefreshCwIcon className="h-4 w-4" />
+
+// ✅ Good
+<RefreshCwIcon className="size-4" />
+```

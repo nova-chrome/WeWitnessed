@@ -95,15 +95,7 @@ Code flows in one direction: `shared → features → app`
 ### 3. No Cross-Feature Imports
 
 Features should not import from each other. Compose features at the app level.
-
-```tsx
-// ❌ Bad: Cross-feature import
-// features/projects/components/project-card.tsx
-import { UserAvatar } from '@/features/users/components/user-avatar'
-
-// ✅ Good: Use shared component or compose at app level
-import { Avatar } from '@/components/ui/avatar'
-```
+See `features/AGENTS.md` for detailed examples.
 
 ### 4. Colocate Related Code
 
@@ -128,48 +120,14 @@ import { UserButton } from '@/features/auth/components'
 import { UserButton } from '@/features/auth/components/user-button'
 ```
 
-### 6. Lucide Icons Convention
+### 6. Server Components by Default
 
-Always import lucide-react icons with the `Icon` suffix:
+Prefer Server Components in Next.js App Router. Use Client Components only when needed.
+See `app/AGENTS.md` for detailed guidance.
 
-```tsx
-// ❌ Bad: No suffix
-import { RefreshCw, X, Loader2 } from "lucide-react"
+### 7. Icon Conventions
 
-// ✅ Good: Icon suffix
-import { RefreshCwIcon, XIcon, Loader2Icon } from "lucide-react"
-```
-
-Use `size-*` for icon dimensions instead of `h-* w-*`:
-
-```tsx
-// ❌ Bad
-<RefreshCwIcon className="h-4 w-4" />
-
-// ✅ Good
-<RefreshCwIcon className="size-4" />
-```
-
-### 7. Server Components by Default
-
-In Next.js App Router, prefer Server Components. Use Client Components only when needed:
-- Event handlers (onClick, onChange)
-- Browser APIs (localStorage, window)
-- Hooks (useState, useEffect, Convex hooks)
-
-```tsx
-// Server Component (default) - no directive needed
-export default function ProjectPage() {
-  return <ProjectList />
-}
-
-// Client Component - explicit directive
-'use client'
-export function ProjectForm() {
-  const [name, setName] = useState('')
-  // ...
-}
-```
+See `components/AGENTS.md` for Lucide icon import and sizing conventions.
 
 ## State Management
 

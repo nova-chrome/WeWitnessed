@@ -16,16 +16,25 @@ This directory contains Next.js App Router routes, layouts, and pages.
 
 ### Server Components by Default
 
-Pages and layouts are Server Components unless they need client interactivity:
+Pages and layouts are Server Components unless they need client interactivity.
+
+**When to use Client Components:**
+- Event handlers (onClick, onChange)
+- Browser APIs (localStorage, window)
+- Hooks (useState, useEffect, Convex hooks)
 
 ```tsx
-// page.tsx - Server Component (default)
+// page.tsx - Server Component (default, no directive needed)
 export default function ProjectsPage() {
   return <ProjectList />
 }
 
-// For client interactivity, create a separate client component
-// and import it into the server page
+// Client Component - explicit directive required
+'use client'
+export function ProjectForm() {
+  const [name, setName] = useState('')
+  // ...
+}
 ```
 
 ### Keep Pages Thin
