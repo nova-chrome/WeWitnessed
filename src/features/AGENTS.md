@@ -10,8 +10,7 @@ features/
     ├── components/     # Feature-specific components
     ├── hooks/          # Feature-specific hooks (including Convex hooks)
     ├── types/          # Feature-specific TypeScript types
-    ├── utils/          # Feature-specific utilities
-    └── index.ts        # Public API exports (optional)
+    └── utils/          # Feature-specific utilities
 ```
 
 ## Rules
@@ -32,7 +31,7 @@ features/projects/
 │   ├── use-create-project.ts # Wraps Convex useMutation
 │   └── use-project-filters.ts
 ├── types/
-│   └── index.ts
+│   └── project.ts
 └── utils/
     └── project-helpers.ts
 ```

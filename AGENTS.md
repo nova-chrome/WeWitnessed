@@ -111,7 +111,7 @@ See `components/AGENTS.md` for Lucide icon import and sizing conventions.
 | **Server State** | Convex | Database records, user data |
 | **URL State** | nuqs | `/projects/123`, `?filter=active` |
 | **Form State** | TanStack Form | Form inputs, validation |
-| **UI State** | zustand | Modals, sidebars, local toggles |
+| **UI State** | zustand | Modals, sidebars, shared toggles |
 
 ### URL State with nuqs
 
@@ -203,8 +203,12 @@ export function Sidebar() {
 - **Small stores** - multiple focused stores, not one giant store
 
 **When to use zustand vs useState:**
-- `useState` - Local to one component, doesn't need sharing
+- `useState` - Local component state, simple toggles, counters
 - `zustand` - Shared across multiple components (modals, sidebars, toasts)
+
+**Form State Rules:**
+- Use TanStack Form for form inputs and validation
+- Never hook individual form fields to `useState` - use form libraries instead
 
 ### Key Rules
 
