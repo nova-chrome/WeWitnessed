@@ -12,6 +12,42 @@ import type {
 type Camera = CameraState &
   CameraControls & { videoRef: React.RefObject<HTMLVideoElement | null> };
 
+/**
+ * Initializes camera stream with specified constraints
+ * @param facingMode - Camera facing mode (user or environment)
+ * @param videoElement - Video element to attach stream to
+ * @returns MediaStream and facing mode on success
+ */
+async function initializeCameraStream(
+  facingMode: FacingMode,
+  videoElement: HTMLVideoElement | null,
+): Promise<{ stream: MediaStream; facingMode: FacingMode }> {
+  // Check if mediaDevices API is available
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    throw new Error(
+      "Camera API not available. Please use HTTPS or localhost.",
+    );
+  }
+
+  const constraints: MediaStreamConstraints = {
+    video: {
+      facingMode: { ideal: facingMode },
+      width: { ideal: 1920 },
+      height: { ideal: 1080 },
+    },
+    audio: false,
+  };
+
+  const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+  if (videoElement) {
+    videoElement.srcObject = stream;
+    await videoElement.play();
+  }
+
+  return { stream, facingMode };
+}
+
 export function useCamera(): Camera {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -37,33 +73,7 @@ export function useCamera(): Camera {
       stopStream();
 
       const { data, error } = await tryCatch(
-        (async () => {
-          // Check if mediaDevices API is available
-          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            throw new Error(
-              "Camera API not available. Please use HTTPS or localhost.",
-            );
-          }
-
-          const constraints: MediaStreamConstraints = {
-            video: {
-              facingMode: { ideal: facingMode },
-              width: { ideal: 1920 },
-              height: { ideal: 1080 },
-            },
-            audio: false,
-          };
-
-          const stream = await navigator.mediaDevices.getUserMedia(constraints);
-          streamRef.current = stream;
-
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-            await videoRef.current.play();
-          }
-
-          return { facingMode };
-        })(),
+        initializeCameraStream(facingMode, videoRef.current),
       );
 
       if (error) {
@@ -76,6 +86,8 @@ export function useCamera(): Camera {
         }));
         return;
       }
+
+      streamRef.current = data.stream;
 
       setState((prev) => ({
         ...prev,
