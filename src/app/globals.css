@@ -123,3 +123,54 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Safe area utilities for iOS notch/home indicator */
+  .pt-safe-or-4 {
+    padding-top: max(env(safe-area-inset-top), 1rem);
+  }
+  
+  .pb-safe-or-6 {
+    padding-bottom: max(env(safe-area-inset-bottom), 1.5rem);
+  }
+
+  /* Tabular numbers for time display */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Custom animations */
+  @keyframes flash {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes pulse-slow {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  .animate-flash {
+    animation: flash 0.3s ease-out;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Radial gradient utility */
+  .bg-gradient-radial {
+    background-image: radial-gradient(circle at center, var(--tw-gradient-stops));
+  }
+}
