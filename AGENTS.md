@@ -43,41 +43,14 @@
 | Framework adapters | Array/object helpers |
 | Schemas (nuqs, zod) | Formatting (currency, numbers) |
 
-```typescript
-// lib/auth-client.ts - Integration
-export const authClient = createAuthClient({ ... })
-
-// utils/format.ts - Pure function
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
-}
-```
-
-**Exception**: `lib/utils.ts` with `cn()` is a shadcn/ui convention - keep it there.
+See `lib/AGENTS.md` and `utils/AGENTS.md` for details and examples.
 
 ## Core Principles
 
 ### 1. Feature-Based Organization
 
-Organize code by feature, not by type. Each feature is self-contained:
-
-```
-features/
-├── auth/
-│   ├── components/
-│   │   ├── login-form.tsx
-│   │   └── register-form.tsx
-│   ├── hooks/
-│   │   └── use-auth.ts
-│   └── types/
-│       └── auth.ts
-├── projects/
-│   ├── components/
-│   │   ├── project-card.tsx
-│   │   └── project-list.tsx
-│   └── hooks/
-│       └── use-projects.ts
-```
+Organize code by feature, not by type. Each feature is self-contained.
+See `features/AGENTS.md` for structure and examples.
 
 ### 2. Unidirectional Code Flow
 
