@@ -67,6 +67,52 @@ export function formatDate(date: Date): string {
 }
 ```
 
+## Error Handling with tryCatch
+
+### Prefer tryCatch Utility Over Raw Try-Catch
+
+Avoid raw `try { ... } catch (e) { ... }` blocks. Use `@/utils/try-catch` instead:
+
+```typescript
+import { tryCatch } from '@/utils/try-catch'
+
+// ❌ Bad: Traditional try-catch
+async function fetchUser(id: string) {
+  try {
+    const user = await api.getUser(id)
+    return user
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+// ✅ Good: tryCatch utility
+async function fetchUser(id: string) {
+  const { data, error } = await tryCatch(api.getUser(id))
+  
+  if (error) {
+    console.error(error)
+    return null
+  }
+  
+  return data
+}
+```
+
+**Benefits:**
+- Type-safe discriminated union (`data` | `error`, never both)
+- Explicit error handling (no silent failures)
+- Cleaner, more functional code style
+- Better TypeScript inference
+
+**Return Type:**
+```typescript
+type Result<T, E = Error> = 
+  | { data: T; error: null }
+  | { data: null; error: E }
+```
+
 ## Note on lib/utils.ts
 
 The `lib/utils.ts` file with the `cn()` function is a shadcn/ui convention.

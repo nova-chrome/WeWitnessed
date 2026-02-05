@@ -220,7 +220,7 @@ export function Sidebar() {
 ## Error Handling
 
 1. Use Error Boundaries for recoverable UI errors
-2. Handle Convex errors in mutations with try/catch
+2. Prefer `@/utils/try-catch` utility for async operations (see `utils/AGENTS.md`)
 3. Use `error.tsx` files for route-level error handling
 4. Track errors in production with tools like Sentry
 
