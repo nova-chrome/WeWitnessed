@@ -124,6 +124,16 @@ Features CANNOT import from:
 - `@/features/*` - Other features
 - `@/app/*` - App routes
 
+## Styling
+
+Feature components follow the same styling conventions as shared components.
+See `src/components/AGENTS.md` for full details.
+
+Key rules:
+- **Always use `cn()` for conditional classes** - never template literals
+- Use `size-*` for icon dimensions, not `h-* w-*`
+- Import Lucide icons with `Icon` suffix
+
 ## When to Create a Feature
 
 Create a new feature when:
