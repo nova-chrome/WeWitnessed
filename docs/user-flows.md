@@ -118,13 +118,13 @@ flowchart TD
 ```mermaid
 flowchart LR
     subgraph Public
-        HOME[/ Home /]
-        EVENT[/e/:slug Gallery]
-        CAMERA[/e/:slug/camera]
+        HOME["/ (Home)"]
+        EVENT["/e/:slug (Gallery)"]
+        CAMERA["/e/:slug/camera"]
     end
 
     subgraph Couple Only
-        MANAGE[/e/:slug/manage]
+        MANAGE["/e/:slug/manage"]
     end
 
     HOME -->|Create event| EVENT
