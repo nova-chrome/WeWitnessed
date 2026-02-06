@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💒 WeWitnessed
 
-## Getting Started
+A wedding guest photo sharing app. Guests capture moments, couples receive memories.
 
-First, run the development server:
+## ✨ About
+
+WeWitnessed lets wedding guests upload photos from their phones to a shared gallery. No accounts required for guests—just scan a QR code, enter your name, and start capturing moments.
+
+## 📋 Features
+
+| Feature | Status |
+|---------|--------|
+| Camera capture UI | ✅ Done |
+| PWA (installable) | ✅ Done |
+| Event creation | 🔜 Planned |
+| Guest upload | 🔜 Planned |
+| Gallery view | 🔜 Planned |
+| Public/private toggle | 🔜 Planned |
+| Offline queue | 🔜 Planned |
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Framework | [Next.js 16](https://nextjs.org/) (App Router) |
+| Backend | [Convex](https://convex.dev/) |
+| Styling | [Tailwind CSS 4](https://tailwindcss.com/) |
+| Components | [shadcn/ui](https://ui.shadcn.com/) + [Radix UI](https://www.radix-ui.com/) |
+| Icons | [Lucide](https://lucide.dev/) |
+| Language | TypeScript |
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- A [Convex](https://convex.dev/) account (free tier works)
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Clone the repo
+git clone https://github.com/your-username/wewitnessed.git
+cd wewitnessed
+
+# Install dependencies
+npm install
+
+# Set up Convex
+npx convex dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Run both Next.js and Convex in development mode:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Terminal 1: Convex backend
+npx convex dev
 
-## Learn More
+# Terminal 2: Next.js frontend
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```text
+wewitnessed/
+├── src/
+│   ├── app/           # Next.js App Router pages
+│   ├── components/    # Shared UI components
+│   ├── features/      # Feature modules (camera, etc.)
+│   ├── lib/           # Configuration
+│   └── utils/         # Pure utility functions
+├── convex/            # Convex backend (schema, functions)
+└── docs/
+    ├── prd/           # Product requirements
+    └── user-flows.md  # User flow diagrams
+```
 
-## Deploy on Vercel
+See `AGENTS.md` files in each directory for detailed conventions.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📜 Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Next.js dev server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npx convex dev` | Start Convex dev server |
+
+## 📄 License
+
+Private project. Not open source (yet).
