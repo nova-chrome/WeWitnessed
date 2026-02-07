@@ -9,7 +9,11 @@
  */
 
 import type * as events from "../events.js";
+import type * as guests from "../guests.js";
 import type * as model_events from "../model/events.js";
+import type * as model_guests from "../model/guests.js";
+import type * as model_photos from "../model/photos.js";
+import type * as photos from "../photos.js";
 
 import type {
   ApiFromModules,
@@ -19,7 +23,11 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   events: typeof events;
+  guests: typeof guests;
   "model/events": typeof model_events;
+  "model/guests": typeof model_guests;
+  "model/photos": typeof model_photos;
+  photos: typeof photos;
 }>;
 
 /**
