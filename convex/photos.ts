@@ -1,5 +1,6 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import * as Events from "./model/events";
 import * as Photos from "./model/photos";
 
 export const generateUploadUrl = mutation({
@@ -25,6 +26,7 @@ export const create = mutation({
 export const getByEvent = query({
   args: {
     eventId: v.id("events"),
+    coupleSecret: v.optional(v.string()),
   },
   returns: v.array(
     v.object({
@@ -38,7 +40,40 @@ export const getByEvent = query({
       url: v.union(v.string(), v.null()),
     }),
   ),
-  handler: async (ctx, { eventId }) => {
-    return Photos.getEventPhotos(ctx, eventId);
+  handler: async (ctx, { eventId, coupleSecret }) => {
+    if (coupleSecret) {
+      const isCouple = await Events.verifyCoupleSecret(
+        ctx,
+        eventId,
+        coupleSecret,
+      );
+      if (isCouple) {
+        return Photos.getEventPhotos(ctx, eventId);
+      }
+    }
+    return Photos.getPublicEventPhotos(ctx, eventId);
+  },
+});
+
+export const toggleVisibility = mutation({
+  args: {
+    photoId: v.id("photos"),
+    eventId: v.id("events"),
+    coupleSecret: v.string(),
+  },
+  returns: v.boolean(),
+  handler: async (ctx, { photoId, eventId, coupleSecret }) => {
+    const isCouple = await Events.verifyCoupleSecret(
+      ctx,
+      eventId,
+      coupleSecret,
+    );
+    if (!isCouple) {
+      throw new ConvexError({
+        code: "Forbidden",
+        message: "Invalid couple secret",
+      });
+    }
+    return Photos.togglePhotoVisibility(ctx, photoId);
   },
 });

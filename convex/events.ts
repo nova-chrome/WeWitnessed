@@ -28,6 +28,17 @@ export const create = mutation({
   },
 });
 
+export const verifyCoupleSecret = query({
+  args: {
+    eventId: v.id("events"),
+    coupleSecret: v.string(),
+  },
+  returns: v.boolean(),
+  handler: async (ctx, { eventId, coupleSecret }) => {
+    return Events.verifyCoupleSecret(ctx, eventId, coupleSecret);
+  },
+});
+
 export const getBySlug = query({
   args: { slug: v.string() },
   returns: v.union(

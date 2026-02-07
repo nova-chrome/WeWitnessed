@@ -1,5 +1,6 @@
 import { ConvexError } from "convex/values";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
+import type { Id } from "../_generated/dataModel";
 
 const SLUG_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -35,4 +36,14 @@ export async function getEventBySlug(ctx: QueryCtx, slug: string) {
     .query("events")
     .withIndex("by_slug", (q) => q.eq("slug", slug))
     .first();
+}
+
+export async function verifyCoupleSecret(
+  ctx: QueryCtx,
+  eventId: Id<"events">,
+  coupleSecret: string,
+): Promise<boolean> {
+  const event = await ctx.db.get(eventId);
+  if (!event) return false;
+  return event.coupleSecret === coupleSecret;
 }
