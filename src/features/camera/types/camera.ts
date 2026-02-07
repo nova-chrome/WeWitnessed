@@ -17,5 +17,5 @@ export interface CameraControls {
   toggleCamera: () => void;
   setZoom: (level: ZoomLevel) => void;
   toggleFlash: () => void;
-  capture: () => void;
+  capture: () => Promise<Blob | null>;
 }

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { SettingsIcon, ImageIcon } from 'lucide-react';
 
 interface CameraControlsProps {
-  onCapture: () => void;
+  onCapture: () => void | Promise<void>;
   isCapturing: boolean;
 }
 

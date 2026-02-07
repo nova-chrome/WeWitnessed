@@ -1,10 +1,15 @@
 "use client";
 
+import { useCallback } from "react";
 import { useCamera } from "../hooks/use-camera";
 import { CameraControls } from "./camera-controls";
 import { CameraSettings } from "./camera-settings";
 
-export function CameraScreen() {
+interface CameraScreenProps {
+  onPhotoCaptured?: (blob: Blob) => void;
+}
+
+export function CameraScreen({ onPhotoCaptured }: CameraScreenProps) {
   const {
     videoRef,
     isReady,
@@ -17,6 +22,13 @@ export function CameraScreen() {
     toggleFlash,
     capture,
   } = useCamera();
+
+  const handleCapture = useCallback(async () => {
+    const blob = await capture();
+    if (blob && onPhotoCaptured) {
+      onPhotoCaptured(blob);
+    }
+  }, [capture, onPhotoCaptured]);
 
   return (
     <div className="relative w-full h-svh bg-[#0a0a0a] overflow-hidden flex flex-col">
@@ -71,7 +83,7 @@ export function CameraScreen() {
       {/* Bottom Controls Area - Dark background */}
       <div className="relative h-44 bg-[#0a0a0a]">
         {isReady && !error && (
-          <CameraControls onCapture={capture} isCapturing={isCapturing} />
+          <CameraControls onCapture={handleCapture} isCapturing={isCapturing} />
         )}
       </div>
     </div>

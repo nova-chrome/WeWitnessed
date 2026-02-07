@@ -119,15 +119,33 @@ export function useCamera(): Camera {
     setState((prev) => ({ ...prev, flashEnabled: !prev.flashEnabled }));
   }, []);
 
-  const capture = useCallback(() => {
-    if (!videoRef.current || !state.isReady) return;
+  const capture = useCallback(async (): Promise<Blob | null> => {
+    const video = videoRef.current;
+    if (!video || !state.isReady) return null;
 
     setState((prev) => ({ ...prev, isCapturing: true }));
 
-    // Simulate capture (in real implementation, this would create a canvas snapshot)
-    setTimeout(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
       setState((prev) => ({ ...prev, isCapturing: false }));
-    }, 300);
+      return null;
+    }
+
+    ctx.drawImage(video, 0, 0);
+
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob((b) => resolve(b), "image/jpeg", 0.85);
+    });
+
+    // Brief flash animation delay
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    setState((prev) => ({ ...prev, isCapturing: false }));
+
+    return blob;
   }, [state.isReady]);
 
   // Initialize camera on mount
