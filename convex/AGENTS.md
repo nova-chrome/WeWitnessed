@@ -263,6 +263,32 @@ export default defineSchema({
 })
 ```
 
+## Environment Variables
+
+Convex functions do **NOT** use t3 env. Instead, read `process.env` directly:
+
+```typescript
+// ✅ Good: Direct process.env in Convex functions
+export const sendEmail = mutation({
+  args: { email: v.string() },
+  handler: async (ctx, { email }) => {
+    const apiKey = process.env.RESEND_API_KEY
+    if (!apiKey) throw new Error('RESEND_API_KEY not configured')
+
+    // Use apiKey...
+  },
+})
+
+// ❌ Bad: Don't import src/ env in Convex
+import { env } from '~/lib/env'  // ❌ Can't access NEXT_PUBLIC_* here
+```
+
+**Why?** Convex functions run on the server only. t3 env is designed for Next.js frontend/API routes and includes client-accessible variables (`NEXT_PUBLIC_*`), which Convex doesn't support.
+
+### Secret Management
+
+For sensitive secrets, use the [Convex dashboard](https://dashboard.convex.dev) to set environment variables—they're managed separately from `.env.local`.
+
 ## References
 
 - [Convex Docs](https://docs.convex.dev)

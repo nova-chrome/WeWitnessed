@@ -344,6 +344,33 @@ Use `form.Subscribe` to react to form state changes like `canSubmit`:
 | Integration | Vitest + Testing Library | Features, component interactions |
 | E2E | Playwright | Critical user flows |
 
+## Environment Variables
+
+Use **t3 env** for type-safe environment variable validation in `src/` code only:
+
+```typescript
+// src/lib/env.ts
+import { createEnv } from "@t3-oss/env-nextjs"
+import { z } from "zod"
+
+export const env = createEnv({
+  server: {
+    SECRET_KEY: z.string().min(1),
+  },
+  client: {
+    NEXT_PUBLIC_API_URL: z.string().url(),
+  },
+  runtimeEnv: {
+    SECRET_KEY: process.env.SECRET_KEY,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  },
+})
+```
+
+**Important**: t3 env is **only for `src/`** (Next.js frontend/API routes). Convex functions read `process.env` directly and have their own secret management.
+
+See `lib/AGENTS.md` for detailed environment variable patterns.
+
 ## Library Usage
 
 Before using library APIs, verify current syntax to avoid deprecated patterns.

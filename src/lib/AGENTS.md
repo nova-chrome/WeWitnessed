@@ -16,7 +16,7 @@ This directory contains configuration, client instances, and external service in
 |------|---------|
 | `auth-client.ts` | Better Auth client instance |
 | `convex.ts` | Convex client utilities |
-| `env.ts` | Type-safe environment variables (t3-env) |
+| `env.ts` | Type-safe environment variables (t3-env) - **src/ only** |
 | `search-params.ts` | nuqs URL state schemas |
 | `utils.ts` | shadcn/ui `cn()` helper (exception) |
 
@@ -55,4 +55,33 @@ export const authClient = createAuthClient({ ... })
 
 // Components import from here
 import { authClient } from '@/lib/auth-client'
+```
+
+## Environment Variables (t3 env)
+
+### When to Use
+
+t3 env is for **client and server code within `src/`** only:
+
+- Server-only variables (secrets, API keys for server components/actions)
+- Client-accessible variables (prefixed with `NEXT_PUBLIC_`)
+- Variables used in pages, components, and route handlers
+
+### NOT for Convex Backend
+
+Do NOT use t3 env in `convex/` directory. Convex functions:
+
+- Cannot access client variables (`NEXT_PUBLIC_*`)
+- Should read environment variables directly: `process.env.VARIABLE_NAME`
+- Have their own secret management in the Convex dashboard
+
+### Usage Pattern
+
+```typescript
+// src/lib/env.ts or imported from there
+import { env } from '~/lib/env'
+
+// Safe to use everywhere in src/
+const convexUrl = env.NEXT_PUBLIC_CONVEX_URL  // Client & server
+const deployment = env.CONVEX_DEPLOYMENT      // Server only (if needed in RSCs)
 ```
