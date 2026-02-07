@@ -10,7 +10,6 @@ import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { cn } from "~/lib/utils";
 import type { CreateEventResult } from "../types/event";
 
 interface EventCreateSuccessProps {
@@ -24,15 +23,22 @@ export function EventCreateSuccess({
   eventName,
   onReset,
 }: EventCreateSuccessProps) {
-  const [copied, setCopied] = useState(false);
-  const [secretRevealed, setSecretRevealed] = useState(false);
+  const [copiedGuest, setCopiedGuest] = useState(false);
+  const [copiedCouple, setCopiedCouple] = useState(false);
 
   const shareableLink = `${window.location.origin}/e/${result.slug}`;
+  const coupleLink = `${shareableLink}?s=${result.coupleSecret}`;
 
-  function handleCopy() {
+  function handleCopyGuest() {
     navigator.clipboard.writeText(shareableLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopiedGuest(true);
+    setTimeout(() => setCopiedGuest(false), 2000);
+  }
+
+  function handleCopyCouple() {
+    navigator.clipboard.writeText(coupleLink);
+    setCopiedCouple(true);
+    setTimeout(() => setCopiedCouple(false), 2000);
   }
 
   return (
@@ -62,10 +68,10 @@ export function EventCreateSuccess({
         </div>
       </div>
 
-      {/* Shareable link */}
+      {/* Guest shareable link */}
       <div className="mb-6">
         <Label className="text-neutral-500 text-xs tracking-wider uppercase mb-2 block">
-          Share this link
+          Guest link
         </Label>
         <div className="flex gap-2">
           <Input
@@ -76,10 +82,10 @@ export function EventCreateSuccess({
           <Button
             variant="outline"
             size="icon"
-            onClick={handleCopy}
+            onClick={handleCopyGuest}
             className="shrink-0 border-neutral-800 bg-neutral-900 hover:bg-neutral-800 text-neutral-400"
           >
-            {copied ? (
+            {copiedGuest ? (
               <CheckIcon className="size-4 text-emerald-400" />
             ) : (
               <CopyIcon className="size-4" />
@@ -88,27 +94,33 @@ export function EventCreateSuccess({
         </div>
       </div>
 
-      {/* Couple secret */}
+      {/* Couple management link */}
       <div className="mb-10">
         <Label className="text-neutral-500 text-xs tracking-wider uppercase mb-2 block">
           <KeyRoundIcon className="size-3 inline-block mr-1.5 -mt-px" />
-          Your couple secret
+          Your couple link
         </Label>
-        <button
-          type="button"
-          onClick={() => setSecretRevealed(true)}
-          className={cn(
-            "w-full text-left px-3 py-2 rounded-md text-sm border transition-colors",
-            "bg-neutral-900 border-neutral-800",
-            secretRevealed
-              ? "font-mono text-neutral-300 cursor-text"
-              : "text-neutral-600 cursor-pointer hover:border-neutral-700",
-          )}
-        >
-          {secretRevealed ? result.coupleSecret : "Tap to reveal"}
-        </button>
+        <div className="flex gap-2">
+          <Input
+            readOnly
+            value={coupleLink}
+            className="bg-neutral-900 border-neutral-800 text-neutral-300 text-sm font-mono"
+          />
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleCopyCouple}
+            className="shrink-0 border-neutral-800 bg-neutral-900 hover:bg-neutral-800 text-neutral-400"
+          >
+            {copiedCouple ? (
+              <CheckIcon className="size-4 text-emerald-400" />
+            ) : (
+              <CopyIcon className="size-4" />
+            )}
+          </Button>
+        </div>
         <p className="text-neutral-600 text-xs mt-2 leading-relaxed">
-          Save this — you&apos;ll need it to manage your event.
+          Bookmark this — use it to manage photo visibility.
         </p>
       </div>
 

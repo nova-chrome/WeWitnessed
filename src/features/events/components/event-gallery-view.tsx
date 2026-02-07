@@ -1,10 +1,18 @@
 "use client";
 
-import { useQuery } from "convex/react";
-import { CameraIcon } from "lucide-react";
+import { useMutation, useQuery } from "convex/react";
+import {
+  CameraIcon,
+  EyeIcon,
+  EyeOffIcon,
+  KeyRoundIcon,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { api } from "../../../../convex/_generated/api";
+import type { Id } from "../../../../convex/_generated/dataModel";
+import { cn } from "~/lib/utils";
+import { useCoupleSession } from "../hooks/use-couple-session";
 
 interface EventGalleryViewProps {
   slug: string;
@@ -12,9 +20,16 @@ interface EventGalleryViewProps {
 
 export function EventGalleryView({ slug }: EventGalleryViewProps) {
   const event = useQuery(api.events.getBySlug, { slug });
+  const couple = useCoupleSession(slug, event?._id);
+
   const photos = useQuery(
     api.photos.getByEvent,
-    event ? { eventId: event._id } : "skip",
+    event
+      ? {
+          eventId: event._id,
+          ...(couple.coupleSecret ? { coupleSecret: couple.coupleSecret } : {}),
+        }
+      : "skip",
   );
 
   if (event === undefined) {
@@ -62,6 +77,12 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
           <h1 className="text-xl font-light text-neutral-100 tracking-tight">
             {event.name}
           </h1>
+          {couple.isCouple && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/10 px-2.5 py-0.5 text-xs text-purple-400 tracking-wide">
+              <KeyRoundIcon className="size-3" />
+              Couple View
+            </span>
+          )}
           {hasPhotos && (
             <p className="text-neutral-500 text-xs tracking-wide">
               {photos.length} {photos.length === 1 ? "photo" : "photos"}
@@ -97,8 +118,22 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
                     alt=""
                     fill
                     sizes="33vw"
-                    className="object-cover"
+                    className={cn(
+                      "object-cover",
+                      couple.isCouple && !photo.isPublic && "opacity-50",
+                    )}
                   />
+                  {couple.isCouple && !photo.isPublic && (
+                    <div className="absolute inset-0 bg-black/30 pointer-events-none" />
+                  )}
+                  {couple.isCouple && couple.coupleSecret && (
+                    <VisibilityToggle
+                      photoId={photo._id}
+                      eventId={event._id}
+                      coupleSecret={couple.coupleSecret}
+                      isPublic={photo.isPublic}
+                    />
+                  )}
                 </div>
               ) : null,
             )}
@@ -115,5 +150,42 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
         <CameraIcon className="size-6 text-white" />
       </Link>
     </div>
+  );
+}
+
+function VisibilityToggle({
+  photoId,
+  eventId,
+  coupleSecret,
+  isPublic,
+}: {
+  photoId: Id<"photos">;
+  eventId: Id<"events">;
+  coupleSecret: string;
+  isPublic: boolean;
+}) {
+  const toggleVisibility = useMutation(api.photos.toggleVisibility);
+
+  async function handleToggle() {
+    await toggleVisibility({ photoId, eventId, coupleSecret });
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleToggle}
+      className={cn(
+        "absolute top-2 right-2 z-10 flex items-center justify-center",
+        "size-8 rounded-full backdrop-blur-md transition-all active:scale-90",
+        isPublic ? "bg-white/20 text-white" : "bg-black/60 text-neutral-400",
+      )}
+      aria-label={isPublic ? "Make private" : "Make public"}
+    >
+      {isPublic ? (
+        <EyeIcon className="size-4" />
+      ) : (
+        <EyeOffIcon className="size-4" />
+      )}
+    </button>
   );
 }
