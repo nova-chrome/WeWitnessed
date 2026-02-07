@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
 import { PropsWithChildren } from "react";
+import { Toaster } from "~/components/ui/sonner";
 import { ConvexProvider } from "~/components/convex-provider";
 import { PWARegister } from "~/components/pwa-register";
 import { cn } from "~/lib/utils";
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
         className={cn(geistSans.variable, geistMono.variable, "antialiased")}
       >
         <ConvexProvider>{children}</ConvexProvider>
+        <Toaster />
         <PWARegister />
       </body>
     </html>

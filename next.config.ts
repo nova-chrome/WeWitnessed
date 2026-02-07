@@ -4,6 +4,14 @@ import "./src/env";
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.convex.cloud",
+      },
+    ],
+  },
   async headers() {
     return [
       {
