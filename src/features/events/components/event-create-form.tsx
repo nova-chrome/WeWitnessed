@@ -90,7 +90,7 @@ export function EventCreateForm() {
               <Field data-invalid={isInvalid}>
                 <FieldLabel
                   htmlFor={field.name}
-                  className="text-neutral-500 text-xs tracking-wider uppercase mb-2"
+                  className="text-muted-foreground text-xs tracking-wider uppercase mb-2"
                 >
                   Event Name
                 </FieldLabel>
@@ -104,7 +104,7 @@ export function EventCreateForm() {
                   onBlur={field.handleBlur}
                   aria-invalid={isInvalid}
                   autoFocus
-                  className="bg-neutral-900 border-neutral-800 text-neutral-100 placeholder:text-neutral-600 focus-visible:ring-neutral-700 focus-visible:border-neutral-700 h-12 text-base"
+                  className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 h-12 text-base"
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
@@ -116,10 +116,10 @@ export function EventCreateForm() {
           {(field) => (
             <Field>
               <FieldLabel
-                className="text-neutral-500 text-xs tracking-wider uppercase mb-2"
+                className="text-muted-foreground text-xs tracking-wider uppercase mb-2"
               >
                 Date{" "}
-                <span className="text-neutral-700 normal-case tracking-normal">
+                <span className="text-muted-foreground/60 normal-case tracking-normal">
                   (optional)
                 </span>
               </FieldLabel>
@@ -130,13 +130,13 @@ export function EventCreateForm() {
                     data-empty={!field.state.value}
                     className={cn(
                       "w-full h-12 justify-start text-left text-base font-normal",
-                      "bg-neutral-900 border-neutral-800 hover:bg-neutral-800 focus-visible:ring-neutral-700 focus-visible:border-neutral-700",
+                      "bg-card border-border hover:bg-secondary",
                       field.state.value
-                        ? "text-neutral-100"
-                        : "text-neutral-600",
+                        ? "text-foreground"
+                        : "text-muted-foreground/60",
                     )}
                   >
-                    <CalendarIcon className="size-4 text-neutral-500" />
+                    <CalendarIcon className="size-4 text-muted-foreground" />
                     {field.state.value
                       ? format(field.state.value, "PPP")
                       : "Pick a date"}
@@ -163,7 +163,7 @@ export function EventCreateForm() {
           <Button
             type="submit"
             disabled={!canSubmit || status === "submitting"}
-            className="w-full h-12 bg-neutral-100 text-neutral-950 font-medium text-sm tracking-wider uppercase hover:bg-white disabled:opacity-40 transition-all"
+            className="w-full h-12 bg-primary text-primary-foreground font-medium text-sm tracking-wider uppercase hover:bg-primary/90 disabled:opacity-40 transition-all"
           >
             {status === "submitting" ? (
               <Loader2Icon className="size-4 animate-spin" />

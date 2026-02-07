@@ -107,7 +107,7 @@ export function EventCameraView({ slug }: EventCameraViewProps) {
 
   if (event === undefined) {
     return (
-      <div className="flex h-svh items-center justify-center bg-[#0a0a0a]">
+      <div className="flex h-svh items-center justify-center bg-background">
         <div className="size-12 animate-spin rounded-full border-4 border-purple-500 border-t-transparent" />
       </div>
     );
@@ -115,8 +115,8 @@ export function EventCameraView({ slug }: EventCameraViewProps) {
 
   if (event === null) {
     return (
-      <div className="flex h-svh flex-col items-center justify-center bg-[#0a0a0a] px-6">
-        <p className="text-sm tracking-wide text-neutral-400">
+      <div className="flex h-svh flex-col items-center justify-center bg-background px-6">
+        <p className="text-sm tracking-wide text-muted-foreground">
           Event not found.
         </p>
       </div>
@@ -146,30 +146,22 @@ export function EventCameraView({ slug }: EventCameraViewProps) {
 
       {/* Guest name prompt dialog */}
       <Dialog open={showNamePrompt} onOpenChange={setShowNamePrompt}>
-        <DialogContent
-          showCloseButton={false}
-          className="border-neutral-800 bg-neutral-900 text-white"
-        >
+        <DialogContent showCloseButton={false}>
           <DialogHeader>
-            <DialogTitle className="text-neutral-100">
-              What's your name?
-            </DialogTitle>
-            <DialogDescription className="text-neutral-400">
+            <DialogTitle>What&apos;s your name?</DialogTitle>
+            <DialogDescription>
               Your name will appear with your photos. You can skip this if you
               prefer.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-2">
-            <Label htmlFor="guest-name" className="text-neutral-300">
-              Name
-            </Label>
+            <Label htmlFor="guest-name">Name</Label>
             <Input
               id="guest-name"
               value={nameInput}
               onChange={(e) => setNameInput(e.target.value)}
               placeholder="e.g. Sarah"
-              className="border-neutral-700 bg-neutral-800 text-white placeholder:text-neutral-500"
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === "Enter" && nameInput.trim()) {
@@ -184,7 +176,7 @@ export function EventCameraView({ slug }: EventCameraViewProps) {
               variant="ghost"
               onClick={handleSkipName}
               disabled={isCreatingGuest}
-              className="text-neutral-400 hover:text-neutral-200"
+              className="text-muted-foreground hover:text-foreground"
             >
               Skip
             </Button>

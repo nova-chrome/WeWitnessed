@@ -4,6 +4,7 @@ import { PropsWithChildren } from "react";
 import { Toaster } from "~/components/ui/sonner";
 import { ConvexProvider } from "~/components/convex-provider";
 import { PWARegister } from "~/components/pwa-register";
+import { ThemeProvider } from "~/components/theme-provider";
 import { cn } from "~/lib/utils";
 import "./globals.css";
 
@@ -26,12 +27,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
   return (
-    <html lang="en" className={nunitoSans.variable}>
+    <html lang="en" className={nunitoSans.variable} suppressHydrationWarning>
       <body
         className={cn(geistSans.variable, geistMono.variable, "antialiased")}
       >
-        <ConvexProvider>{children}</ConvexProvider>
-        <Toaster />
+        <ThemeProvider>
+          <ConvexProvider>{children}</ConvexProvider>
+          <Toaster />
+        </ThemeProvider>
         <PWARegister />
       </body>
     </html>
