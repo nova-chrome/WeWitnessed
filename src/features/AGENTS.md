@@ -4,7 +4,7 @@ This directory contains feature-based modules. Each feature is a self-contained 
 
 ## Structure
 
-```
+```txt
 features/
 └── [feature-name]/
     ├── components/     # Feature-specific components
@@ -19,7 +19,7 @@ features/
 
 Each feature should be independent and contain everything it needs:
 
-```
+```txt
 features/projects/
 ├── components/
 │   ├── project-card.tsx
@@ -51,7 +51,32 @@ import { Card } from '@/components/ui/card'
 
 ### Convex Hooks Pattern
 
-Wrap Convex queries/mutations in feature-specific hooks:
+**Use Convex hooks directly in components** unless the logic is complex enough to justify abstraction.
+
+Direct usage (preferred):
+
+```tsx
+// features/events/components/event-create-form.tsx
+'use client'
+
+import { useMutation } from 'convex/react'
+import { api } from '@/convex/_generated/api'
+
+export function EventCreateForm() {
+  const createEvent = useMutation(api.events.create)
+
+  const handleSubmit = async (data) => {
+    const result = await createEvent(data)
+    // Handle result
+  }
+
+  return <form onSubmit={handleSubmit}>...</form>
+}
+```
+
+**Only wrap when complexity warrants it:**
+
+If you have business logic (loading states, error handling, data transformation), then create a custom hook:
 
 ```tsx
 // features/projects/hooks/use-projects.ts
@@ -62,26 +87,10 @@ import { api } from '@/convex/_generated/api'
 
 export function useProjects(filters?: ProjectFilters) {
   const projects = useQuery(api.projects.list, filters ?? {})
-  
+
   return {
     projects: projects ?? [],
     isLoading: projects === undefined,
-  }
-}
-```
-
-```tsx
-// features/projects/hooks/use-create-project.ts
-'use client'
-
-import { useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api'
-
-export function useCreateProject() {
-  const createProject = useMutation(api.projects.create)
-  
-  return {
-    createProject,
   }
 }
 ```
@@ -114,6 +123,7 @@ export function ProjectList() {
 ## Imports
 
 Features CAN import from:
+
 - `@/components/*` - Shared UI components
 - `@/hooks/*` - Shared hooks
 - `@/lib/*` - Utilities
@@ -121,6 +131,7 @@ Features CAN import from:
 - `@/convex/_generated/*` - Convex generated API
 
 Features CANNOT import from:
+
 - `@/features/*` - Other features
 - `@/app/*` - App routes
 
@@ -130,6 +141,7 @@ Feature components follow the same styling conventions as shared components.
 See `src/components/AGENTS.md` for full details.
 
 Key rules:
+
 - **Always use `cn()` for conditional classes** - never template literals
 - Use `size-*` for icon dimensions, not `h-* w-*`
 - Import Lucide icons with `Icon` suffix
@@ -137,6 +149,7 @@ Key rules:
 ## When to Create a Feature
 
 Create a new feature when:
+
 - It has multiple related components
 - It has its own data model in Convex
 - It represents a distinct domain concept

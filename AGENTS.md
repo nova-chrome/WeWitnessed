@@ -210,6 +210,118 @@ export function Sidebar() {
 - Use TanStack Form for form inputs and validation
 - Never hook individual form fields to `useState` - use form libraries instead
 
+### TanStack Form Pattern
+
+#### Validation Schema at Top
+
+Define Zod schemas at the top of the file for reusability and clarity:
+
+```tsx
+// features/events/components/event-create-form.tsx
+'use client'
+
+import { useForm } from '@tanstack/react-form'
+import { z } from 'zod'
+
+const EventCreateFormSchema = z.object({
+  name: z.string().trim().min(1, 'Event name is required'),
+  date: z.string(),
+})
+```
+
+#### Global Validation
+
+Use `validators.onSubmit` for schema-level validation instead of field-level validators:
+
+```tsx
+const form = useForm({
+  defaultValues: {
+    name: '',
+    date: '',
+  },
+  validators: {
+    onSubmit: EventCreateFormSchema, // ✅ Global validation on submit
+  },
+  onSubmit: async ({ value }) => {
+    // value is type-safe and validated
+    const res = await createEvent({
+      name: value.name.trim(),
+      date: value.date ? new Date(value.date).getTime() : undefined,
+    })
+    // Handle success...
+  },
+})
+```
+
+#### Use Field Components
+
+Import Field components from `@/components/ui/field`:
+
+```tsx
+import { Field, FieldLabel, FieldError } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+
+<form.Field name="name">
+  {(field) => {
+    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+    return (
+      <Field data-invalid={isInvalid}>
+        <FieldLabel htmlFor={field.name}>Event Name</FieldLabel>
+        <Input
+          id={field.name}
+          name={field.name}
+          value={field.state.value}
+          onChange={(e) => field.handleChange(e.target.value)}
+          onBlur={field.handleBlur}
+        />
+        {isInvalid && <FieldError errors={field.state.meta.errors} />}
+      </Field>
+    )
+  }}
+</form.Field>
+```
+
+#### No Children Prop
+
+Form components are self-contained—they don't accept children. Instead, they manage the entire form state and UI:
+
+```tsx
+// ✅ Good: Self-contained form component
+export function EventCreateForm() {
+  const form = useForm({ /* ... */ })
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit() }}>
+      <form.Field name="name">{/* ... */}</form.Field>
+      <form.Field name="date">{/* ... */}</form.Field>
+      <form.Subscribe selector={(state) => [state.canSubmit]}>
+        {([canSubmit]) => <button disabled={!canSubmit}>Submit</button>}
+      </form.Subscribe>
+    </form>
+  )
+}
+
+// ❌ Bad: Don't pass children—form manages its own rendering
+export function EventCreateForm({ children }) {
+  // This pattern defeats the purpose of form state management
+}
+```
+
+#### Subscribe for Submit Button State
+
+Use `form.Subscribe` to react to form state changes like `canSubmit`:
+
+```tsx
+<form.Subscribe
+  selector={(state) => [state.canSubmit, state.isSubmitting]}
+>
+  {([canSubmit, isSubmitting]) => (
+    <Button type="submit" disabled={!canSubmit || isSubmitting}>
+      {isSubmitting ? <Loader2Icon className="animate-spin" /> : 'Submit'}
+    </Button>
+  )}
+</form.Subscribe>
+```
+
 ### Key Rules
 
 1. **Convex is the source of truth** for server data - no need for React Query or SWR
