@@ -2,7 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "convex/react";
-import { format } from "date-fns";
+import { format, startOfDay } from "date-fns";
 import { CalendarIcon, Loader2Icon, SparklesIcon } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
@@ -147,6 +147,7 @@ export function EventCreateForm() {
                     mode="single"
                     selected={field.state.value}
                     onSelect={(date) => field.handleChange(date)}
+                    disabled={{ before: startOfDay(new Date()) }}
                   />
                 </PopoverContent>
               </Popover>
