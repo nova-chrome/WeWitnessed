@@ -21,6 +21,14 @@ const getLocalStorageItem = (key: string): string | null => {
   return window.localStorage.getItem(key);
 };
 
+function parseJSON<T>(value: string, fallback: T): T {
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 const useLocalStorageSubscribe = (callback: () => void): (() => void) => {
   window.addEventListener("storage", callback);
   return () => window.removeEventListener("storage", callback);
@@ -45,7 +53,7 @@ export function useLocalStorage<T>(
       try {
         const nextState =
           typeof v === "function"
-            ? (v as (prev: T) => T)(JSON.parse(store!))
+            ? (v as (prev: T) => T)(parseJSON(store!, initialValue))
             : v;
 
         if (nextState === undefined || nextState === null) {
@@ -73,5 +81,5 @@ export function useLocalStorage<T>(
     removeLocalStorageItem(key);
   }, [key]);
 
-  return [store ? (JSON.parse(store) as T) : initialValue, setState, remove];
+  return [store ? parseJSON(store, initialValue) : initialValue, setState, remove];
 }
