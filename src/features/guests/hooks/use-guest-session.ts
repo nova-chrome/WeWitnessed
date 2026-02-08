@@ -2,8 +2,8 @@
 
 import { useMutation, useQuery } from "convex/react";
 import { useCallback, useState } from "react";
-import { api } from "../../../../convex/_generated/api";
-import type { Id } from "../../../../convex/_generated/dataModel";
+import { api } from "~/convex/_generated/api";
+import type { Id } from "~/convex/_generated/dataModel";
 import { useLocalStorage } from "~/hooks/use-local-storage";
 import { STORAGE_KEYS } from "~/lib/storage-keys";
 
@@ -28,10 +28,8 @@ export function useGuestSession(
     eventId && deviceId ? { eventId, deviceId } : "skip",
   );
 
-  const [cachedGuestId, setCachedGuestId] = useLocalStorage<Id<"guests"> | null>(
-    STORAGE_KEYS.guest(slug),
-    null,
-  );
+  const [cachedGuestId, setCachedGuestId] =
+    useLocalStorage<Id<"guests"> | null>(STORAGE_KEYS.guest(slug), null);
 
   const guestId = existingGuest?._id ?? cachedGuestId;
   const guestName = existingGuest?.name ?? null;

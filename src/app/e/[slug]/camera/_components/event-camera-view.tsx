@@ -3,12 +3,12 @@
 import { useQuery } from "convex/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { api } from "~/convex/_generated/api";
 import { CameraScreen } from "~/features/camera/components/camera-screen";
 import { GuestNameDialog } from "~/features/guests/components/guest-name-dialog";
 import { useGuestSession } from "~/features/guests/hooks/use-guest-session";
 import { usePhotoUpload } from "~/features/photos/hooks/use-photo-upload";
 import { tryCatch } from "~/utils/try-catch";
-import { api } from "../../../../../../convex/_generated/api";
 
 interface EventCameraViewProps {
   slug: string;

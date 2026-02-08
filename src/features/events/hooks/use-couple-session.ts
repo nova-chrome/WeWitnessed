@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
 import { useQuery } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
-import type { Id } from "../../../../convex/_generated/dataModel";
+import { useEffect } from "react";
+import { api } from "~/convex/_generated/api";
+import type { Id } from "~/convex/_generated/dataModel";
 import { useLocalStorage } from "~/hooks/use-local-storage";
 import { STORAGE_KEYS } from "~/lib/storage-keys";
 
@@ -23,10 +23,9 @@ export function useCoupleSession(
   slug: string,
   eventId: Id<"events"> | undefined,
 ): CoupleSession {
-  const [coupleSecret, setCoupleSecret, removeCoupleSecret] = useLocalStorage<string | null>(
-    STORAGE_KEYS.couple(slug),
-    null,
-  );
+  const [coupleSecret, setCoupleSecret, removeCoupleSecret] = useLocalStorage<
+    string | null
+  >(STORAGE_KEYS.couple(slug), null);
 
   // Persist secret from URL and clean the search param
   useEffect(() => {

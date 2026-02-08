@@ -21,8 +21,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
+import { api } from "~/convex/_generated/api";
 import { cn } from "~/lib/utils";
-import { api } from "../../../../convex/_generated/api";
 import type { CreateEventResult } from "../types/event";
 import { EventCreateSuccess } from "./event-create-success";
 
@@ -30,13 +30,10 @@ type Status = "idle" | "submitting" | "success";
 
 const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]*[a-z0-9]$/;
 
-const optionalSlugLike = z.string().refine(
-  (v) => {
-    const s = v.trim().toLowerCase();
-    return s === "" || (s.length >= 3 && s.length <= 40 && SLUG_PATTERN.test(s));
-  },
-  "3-40 chars, lowercase letters, numbers, and hyphens only (no leading/trailing hyphens)",
-);
+const optionalSlugLike = z.string().refine((v) => {
+  const s = v.trim().toLowerCase();
+  return s === "" || (s.length >= 3 && s.length <= 40 && SLUG_PATTERN.test(s));
+}, "3-40 chars, lowercase letters, numbers, and hyphens only (no leading/trailing hyphens)");
 
 const EventCreateFormSchema = z.object({
   name: z.string().trim().min(1, "Event name is required"),
@@ -137,9 +134,7 @@ export function EventCreateForm() {
         <form.Field name="date">
           {(field) => (
             <Field>
-              <FieldLabel
-                className="text-muted-foreground text-xs tracking-wider uppercase mb-2"
-              >
+              <FieldLabel className="text-muted-foreground text-xs tracking-wider uppercase mb-2">
                 Date{" "}
                 <span className="text-muted-foreground/60 normal-case tracking-normal">
                   (optional)

@@ -1,20 +1,15 @@
 "use client";
 
 import { useMutation, useQuery } from "convex/react";
-import {
-  CameraIcon,
-  EyeIcon,
-  EyeOffIcon,
-  KeyRoundIcon,
-} from "lucide-react";
+import { CameraIcon, EyeIcon, EyeOffIcon, KeyRoundIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { api } from "../../../../../convex/_generated/api";
-import type { Id } from "../../../../../convex/_generated/dataModel";
 import { ThemeToggle } from "~/components/theme-toggle";
-import { cn } from "~/lib/utils";
-import { useCoupleSession } from "~/features/events/hooks/use-couple-session";
+import { api } from "~/convex/_generated/api";
+import type { Id } from "~/convex/_generated/dataModel";
 import { EventShareDialog } from "~/features/events/components/event-share-dialog";
+import { useCoupleSession } from "~/features/events/hooks/use-couple-session";
+import { cn } from "~/lib/utils";
 
 interface EventGalleryViewProps {
   slug: string;
@@ -40,8 +35,12 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
         <div className="absolute inset-0 bg-gradient-radial from-muted via-background to-background pointer-events-none" />
 
         <div className="relative flex flex-col items-center justify-center min-h-svh px-6">
-          <div className="animate-spin text-4xl text-muted-foreground">&#9670;</div>
-          <p className="text-muted-foreground text-center text-sm mt-4">Loading...</p>
+          <div className="animate-spin text-4xl text-muted-foreground">
+            &#9670;
+          </div>
+          <p className="text-muted-foreground text-center text-sm mt-4">
+            Loading...
+          </p>
         </div>
       </div>
     );
@@ -191,7 +190,9 @@ function VisibilityToggle({
       className={cn(
         "absolute top-2 right-2 z-10 flex items-center justify-center",
         "size-8 rounded-full backdrop-blur-md transition-all active:scale-90",
-        isPublic ? "bg-white/20 text-white" : "bg-black/60 text-muted-foreground",
+        isPublic
+          ? "bg-white/20 text-white"
+          : "bg-black/60 text-muted-foreground",
       )}
       aria-label={isPublic ? "Make private" : "Make public"}
     >
