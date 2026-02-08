@@ -26,9 +26,7 @@ const useLocalStorageSubscribe = (callback: () => void): (() => void) => {
   return () => window.removeEventListener("storage", callback);
 };
 
-const getLocalStorageServerSnapshot = (): never => {
-  throw Error("useLocalStorage is a client-only hook");
-};
+const getLocalStorageServerSnapshot = (): null => null;
 
 export function useLocalStorage<T>(
   key: string,
