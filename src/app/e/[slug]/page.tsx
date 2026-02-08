@@ -1,4 +1,4 @@
-import { EventGalleryView } from "~/features/events/components/event-gallery-view";
+import { EventGalleryView } from "./_components/event-gallery-view";
 
 interface EventPageProps {
   params: Promise<{ slug: string }>;

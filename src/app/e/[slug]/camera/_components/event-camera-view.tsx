@@ -1,12 +1,10 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
 import { useQuery } from "convex/react";
 import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
+import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
-import { api } from "../../../../convex/_generated/api";
-import { tryCatch } from "~/utils/try-catch";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -21,6 +19,8 @@ import { Label } from "~/components/ui/label";
 import { CameraScreen } from "~/features/camera/components/camera-screen";
 import { useGuestSession } from "~/features/guests/hooks/use-guest-session";
 import { usePhotoUpload } from "~/features/photos/hooks/use-photo-upload";
+import { tryCatch } from "~/utils/try-catch";
+import { api } from "../../../../../../convex/_generated/api";
 
 interface EventCameraViewProps {
   slug: string;
@@ -28,10 +28,7 @@ interface EventCameraViewProps {
 
 export function EventCameraView({ slug }: EventCameraViewProps) {
   const event = useQuery(api.events.getBySlug, { slug });
-  const { guestId, isReady, createGuest } = useGuestSession(
-    slug,
-    event?._id,
-  );
+  const { guestId, createGuest } = useGuestSession(slug, event?._id);
   const { upload, isUploading } = usePhotoUpload();
 
   const [showNamePrompt, setShowNamePrompt] = useState(false);

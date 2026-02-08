@@ -9,11 +9,11 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { api } from "../../../../convex/_generated/api";
-import type { Id } from "../../../../convex/_generated/dataModel";
+import { api } from "../../../../../convex/_generated/api";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { cn } from "~/lib/utils";
-import { useCoupleSession } from "../hooks/use-couple-session";
+import { useCoupleSession } from "~/features/events/hooks/use-couple-session";
 
 interface EventGalleryViewProps {
   slug: string;

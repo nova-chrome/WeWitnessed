@@ -1,4 +1,4 @@
-import { EventCameraView } from "~/features/events/components/event-camera-view";
+import { EventCameraView } from "./_components/event-camera-view";
 
 interface CameraPageProps {
   params: Promise<{ slug: string }>;
