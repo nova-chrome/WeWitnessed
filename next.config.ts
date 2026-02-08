@@ -3,6 +3,7 @@ import "./src/env";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  devIndicators: false,
   reactCompiler: true,
   images: {
     remotePatterns: [
@@ -15,23 +16,23 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: '/sw.js',
+        source: "/sw.js",
         headers: [
           {
-            key: 'Content-Type',
-            value: 'application/javascript; charset=utf-8',
+            key: "Content-Type",
+            value: "application/javascript; charset=utf-8",
           },
           {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate',
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
           },
           {
-            key: 'Content-Security-Policy',
+            key: "Content-Security-Policy",
             value: "default-src 'self'; script-src 'self'",
           },
         ],
       },
-    ]
+    ];
   },
 };
 
