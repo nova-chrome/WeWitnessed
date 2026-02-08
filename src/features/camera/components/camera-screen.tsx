@@ -35,7 +35,7 @@ export function CameraScreen({
   }, [capture, onPhotoCaptured]);
 
   return (
-    <div className="relative w-full h-svh bg-[#0a0a0a] overflow-hidden flex flex-col">
+    <div className="relative w-full h-svh bg-background overflow-hidden flex flex-col">
       {/* Camera Viewfinder Container */}
       <div className="relative flex-1 overflow-hidden">
         {/* Camera Preview with rounded corners */}
@@ -54,30 +54,30 @@ export function CameraScreen({
 
         {/* Error State */}
         {error && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm rounded-b-[32px]">
+          <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-b-[32px]">
             <div className="text-center px-6">
-              <p className="text-white text-lg mb-2">Camera Access Required</p>
-              <p className="text-white/60 text-sm">{error}</p>
+              <p className="text-foreground text-lg mb-2">Camera Access Required</p>
+              <p className="text-muted-foreground text-sm">{error}</p>
             </div>
           </div>
         )}
 
         {/* Loading State */}
         {!isReady && !error && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black rounded-b-[32px]">
+          <div className="absolute inset-0 flex items-center justify-center bg-background rounded-b-[32px]">
             <div className="flex flex-col items-center gap-4">
-              <div className="size-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-              <p className="text-white/60 text-sm">Initializing camera...</p>
+              <div className="size-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+              <p className="text-muted-foreground text-sm">Initializing camera...</p>
             </div>
           </div>
         )}
 
         {/* Upload overlay */}
         {isUploading && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-b-[32px]">
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/40 backdrop-blur-sm rounded-b-[32px]">
             <div className="flex flex-col items-center gap-3">
-              <div className="size-10 animate-spin rounded-full border-3 border-white border-t-transparent" />
-              <span className="text-sm font-medium text-white">
+              <div className="size-10 animate-spin rounded-full border-3 border-foreground border-t-transparent" />
+              <span className="text-sm font-medium text-foreground">
                 Uploading...
               </span>
             </div>
@@ -95,8 +95,8 @@ export function CameraScreen({
         )}
       </div>
 
-      {/* Bottom Controls Area - Dark background */}
-      <div className="relative h-44 bg-[#0a0a0a]">
+      {/* Bottom Controls Area */}
+      <div className="relative h-44 bg-background">
         {isReady && !error && (
           <CameraControls onCapture={handleCapture} isCapturing={isCapturing} />
         )}

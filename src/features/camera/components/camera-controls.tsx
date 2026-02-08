@@ -27,7 +27,7 @@ export function CameraControls({
   return (
     <div className="absolute inset-0 flex flex-col justify-center items-center pb-safe-or-6">
       {/* Time Display */}
-      <div className="mb-6 text-white text-4xl font-light tabular-nums">
+      <div className="mb-6 text-muted-foreground dark:text-foreground text-4xl font-light tabular-nums">
         {currentTime}
       </div>
 
@@ -35,10 +35,10 @@ export function CameraControls({
       <div className="flex items-center justify-between w-full px-8">
         {/* Settings */}
         <button
-          className="flex items-center justify-center size-12 rounded-full transition-all hover:bg-white/10 active:scale-95"
+          className="flex items-center justify-center size-12 rounded-full transition-all hover:bg-foreground/10 active:scale-95"
           aria-label="Settings"
         >
-          <SettingsIcon className="size-6 text-white" />
+          <SettingsIcon className="size-6 text-muted-foreground dark:text-foreground" />
         </button>
 
         {/* Capture Button */}
@@ -48,21 +48,21 @@ export function CameraControls({
           className="relative flex items-center justify-center size-20 rounded-full transition-all active:scale-95 disabled:opacity-50"
           aria-label="Capture photo"
         >
-          {/* Outer ring with purple gradient */}
-          <div className="absolute inset-0 rounded-full bg-linear-to-br from-purple-500 to-purple-600 p-1">
-            <div className="size-full rounded-full bg-[#0a0a0a]" />
+          {/* Outer ring with primary gradient */}
+          <div className="absolute inset-0 rounded-full bg-linear-to-br from-primary to-primary/80 p-1">
+            <div className="size-full rounded-full bg-background" />
           </div>
 
           {/* Inner white button */}
-          <div className="relative size-[68px] rounded-full bg-white transition-transform hover:scale-95" />
+          <div className="relative size-[68px] rounded-full bg-foreground transition-transform hover:scale-95" />
         </button>
 
         {/* Gallery */}
         <button
-          className="flex items-center justify-center size-12 rounded-full border-2 border-white/30 transition-all hover:bg-white/10 active:scale-95 overflow-hidden"
+          className="flex items-center justify-center size-12 rounded-full border-2 border-muted-foreground/30 dark:border-foreground/30 transition-all hover:bg-foreground/10 active:scale-95 overflow-hidden"
           aria-label="Open gallery"
         >
-          <ImageIcon className="size-6 text-white" />
+          <ImageIcon className="size-6 text-muted-foreground dark:text-foreground" />
         </button>
       </div>
     </div>
