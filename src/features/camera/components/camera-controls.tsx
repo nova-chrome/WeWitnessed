@@ -1,48 +1,34 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { SettingsIcon, ImageIcon } from 'lucide-react';
+import { format } from "date-fns";
+import { ImageIcon, SettingsIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface CameraControlsProps {
   onCapture: () => void | Promise<void>;
   isCapturing: boolean;
 }
 
-export function CameraControls({ onCapture, isCapturing }: CameraControlsProps) {
-  const [currentTime, setCurrentTime] = useState('');
+export function CameraControls({
+  onCapture,
+  isCapturing,
+}: CameraControlsProps) {
+  const [currentTime, setCurrentTime] = useState(() =>
+    format(new Date(), "h:mm a"),
+  );
 
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      setCurrentTime(`${hours} ${minutes}`);
-    };
-
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-
+    const interval = setInterval(() => {
+      setCurrentTime(format(new Date(), "h:mm a"));
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="absolute inset-0 flex flex-col justify-center items-center pb-safe-or-6">
-      {/* Time Display - Individual digits with spacing */}
-      <div className="flex justify-center items-center gap-1 mb-6">
-        {currentTime.split(' ').map((num, i) => (
-          <span key={i} className="flex items-center gap-1">
-            {num.split('').map((digit, j) => (
-              <span
-                key={j}
-                className={`text-white text-2xl font-light tabular-nums ${
-                  i === 1 && j === 0 ? 'text-white' : 'text-white/60'
-                }`}
-              >
-                {digit}
-              </span>
-            ))}
-          </span>
-        ))}
+      {/* Time Display */}
+      <div className="mb-6 text-white text-4xl font-light tabular-nums">
+        {currentTime}
       </div>
 
       {/* Control Bar */}
@@ -63,10 +49,10 @@ export function CameraControls({ onCapture, isCapturing }: CameraControlsProps) 
           aria-label="Capture photo"
         >
           {/* Outer ring with purple gradient */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 p-1">
+          <div className="absolute inset-0 rounded-full bg-linear-to-br from-purple-500 to-purple-600 p-1">
             <div className="size-full rounded-full bg-[#0a0a0a]" />
           </div>
-          
+
           {/* Inner white button */}
           <div className="relative size-[68px] rounded-full bg-white transition-transform hover:scale-95" />
         </button>

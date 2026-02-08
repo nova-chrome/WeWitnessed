@@ -1,5 +1,5 @@
-import { EventCreateForm } from "~/features/events/components/event-create-form";
 import { ThemeToggle } from "~/components/theme-toggle";
+import { EventCreateForm } from "~/features/events/components/event-create-form";
 
 export default function Home() {
   return (
@@ -11,7 +11,7 @@ export default function Home() {
       <div className="absolute inset-0 bg-gradient-radial from-muted via-background to-background pointer-events-none" />
 
       {/* Thin accent line at top */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" />
 
       {/* Theme toggle */}
       <div className="absolute top-4 right-4 z-10">
@@ -27,7 +27,7 @@ export default function Home() {
             <div className="text-7xl font-light text-foreground tracking-tight">
               W
             </div>
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-px bg-gradient-to-r from-transparent via-muted-foreground to-transparent" />
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-px bg-linear-to-r from-transparent via-muted-foreground to-transparent" />
           </div>
 
           {/* Title */}

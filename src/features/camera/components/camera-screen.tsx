@@ -6,20 +6,24 @@ import { CameraControls } from "./camera-controls";
 import { CameraSettings } from "./camera-settings";
 
 interface CameraScreenProps {
+  backHref?: string;
+  isUploading?: boolean;
   onPhotoCaptured?: (blob: Blob) => void;
 }
 
-export function CameraScreen({ onPhotoCaptured }: CameraScreenProps) {
+export function CameraScreen({
+  backHref,
+  isUploading,
+  onPhotoCaptured,
+}: CameraScreenProps) {
   const {
     videoRef,
     isReady,
     error,
     zoomLevel,
-    flashEnabled,
     isCapturing,
     toggleCamera,
     setZoom,
-    toggleFlash,
     capture,
   } = useCamera();
 
@@ -68,12 +72,23 @@ export function CameraScreen({ onPhotoCaptured }: CameraScreenProps) {
           </div>
         )}
 
+        {/* Upload overlay */}
+        {isUploading && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-b-[32px]">
+            <div className="flex flex-col items-center gap-3">
+              <div className="size-10 animate-spin rounded-full border-3 border-white border-t-transparent" />
+              <span className="text-sm font-medium text-white">
+                Uploading...
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Top Camera Settings */}
         {isReady && !error && (
           <CameraSettings
-            flashEnabled={flashEnabled}
+            backHref={backHref}
             zoomLevel={zoomLevel}
-            onToggleFlash={toggleFlash}
             onZoomChange={setZoom}
             onToggleCamera={toggleCamera}
           />

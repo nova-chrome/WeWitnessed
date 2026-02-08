@@ -1,37 +1,36 @@
 'use client';
 
-import { ZapIcon, ZapOffIcon, RefreshCwIcon } from 'lucide-react';
+import { ArrowLeftIcon, RefreshCwIcon } from 'lucide-react';
+import Link from 'next/link';
 import type { ZoomLevel } from '../types/camera';
 
 interface CameraSettingsProps {
-  flashEnabled: boolean;
+  backHref?: string;
   zoomLevel: ZoomLevel;
-  onToggleFlash: () => void;
   onZoomChange: (level: ZoomLevel) => void;
   onToggleCamera: () => void;
 }
 
 export function CameraSettings({
-  flashEnabled,
+  backHref,
   zoomLevel,
-  onToggleFlash,
   onZoomChange,
   onToggleCamera,
 }: CameraSettingsProps) {
   return (
     <div className="absolute top-0 left-0 right-0 z-10 flex items-start justify-between px-5 pt-safe-or-4">
-      {/* Flash Toggle */}
-      <button
-        onClick={onToggleFlash}
-        className="flex items-center justify-center size-10 rounded-full bg-black/50 backdrop-blur-md transition-all hover:bg-black/60 active:scale-95"
-        aria-label={flashEnabled ? 'Disable flash' : 'Enable flash'}
-      >
-        {flashEnabled ? (
-          <ZapIcon className="size-5 text-amber-400 fill-amber-400" />
-        ) : (
-          <ZapOffIcon className="size-5 text-white" />
-        )}
-      </button>
+      {/* Back Button */}
+      {backHref ? (
+        <Link
+          href={backHref}
+          className="flex items-center justify-center size-10 rounded-full bg-black/50 backdrop-blur-md transition-all hover:bg-black/60 active:scale-95"
+          aria-label="Back to gallery"
+        >
+          <ArrowLeftIcon className="size-5 text-white" />
+        </Link>
+      ) : (
+        <div className="size-10" />
+      )}
 
       {/* Zoom Controls - Darker container */}
       <div className="flex items-center gap-0 bg-black/60 backdrop-blur-md rounded-full p-1">
