@@ -147,7 +147,7 @@ export function EventCreateForm() {
                     data-empty={!field.state.value}
                     className={cn(
                       "w-full h-12 justify-start text-left text-base font-normal",
-                      "bg-card border-border hover:bg-secondary",
+                      "bg-card border-border hover:bg-primary/10 hover:text-primary",
                       field.state.value
                         ? "text-foreground"
                         : "text-muted-foreground/60",
