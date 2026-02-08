@@ -1,15 +1,14 @@
 "use client";
 
 import {
-  CheckIcon,
-  CopyIcon,
   DownloadIcon,
   KeyRoundIcon,
   Share2Icon,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Button } from "~/components/ui/button";
+import { CopyButton } from "~/components/copy-button";
 import {
   Dialog,
   DialogContent,
@@ -34,24 +33,10 @@ export function EventShareDialog({
   className,
 }: EventShareDialogProps) {
   const qrRef = useRef<HTMLDivElement>(null);
-  const [copiedGuest, setCopiedGuest] = useState(false);
-  const [copiedCouple, setCopiedCouple] = useState(false);
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const guestLink = `${origin}/e/${slug}`;
   const coupleLink = `${guestLink}?s=${coupleSecret}`;
-
-  function handleCopyGuest() {
-    navigator.clipboard.writeText(guestLink);
-    setCopiedGuest(true);
-    setTimeout(() => setCopiedGuest(false), 2000);
-  }
-
-  function handleCopyCouple() {
-    navigator.clipboard.writeText(coupleLink);
-    setCopiedCouple(true);
-    setTimeout(() => setCopiedCouple(false), 2000);
-  }
 
   function handleDownloadQR() {
     const svg = qrRef.current?.querySelector("svg");
@@ -137,18 +122,7 @@ export function EventShareDialog({
               value={guestLink}
               className="bg-card border-border text-foreground text-sm font-mono"
             />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleCopyGuest}
-              className="shrink-0 text-muted-foreground"
-            >
-              {copiedGuest ? (
-                <CheckIcon className="size-4 text-emerald-400" />
-              ) : (
-                <CopyIcon className="size-4" />
-              )}
-            </Button>
+            <CopyButton value={guestLink} />
           </div>
         </div>
 
@@ -164,18 +138,7 @@ export function EventShareDialog({
               value={coupleLink}
               className="bg-card border-border text-foreground text-sm font-mono"
             />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleCopyCouple}
-              className="shrink-0 text-muted-foreground"
-            >
-              {copiedCouple ? (
-                <CheckIcon className="size-4 text-emerald-400" />
-              ) : (
-                <CopyIcon className="size-4" />
-              )}
-            </Button>
+            <CopyButton value={coupleLink} />
           </div>
           <p className="text-muted-foreground/60 text-xs mt-2 leading-relaxed">
             This link includes your couple secret for managing photos.

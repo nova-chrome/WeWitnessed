@@ -1,13 +1,9 @@
 "use client";
 
-import {
-  CheckIcon,
-  CopyIcon,
-  KeyRoundIcon,
-} from "lucide-react";
+import { KeyRoundIcon } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { useState } from "react";
 import { Button } from "~/components/ui/button";
+import { CopyButton } from "~/components/copy-button";
 import { useLocalStorage } from "~/hooks/use-local-storage";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -28,23 +24,8 @@ export function EventCreateSuccess({
   // Persist couple secret to localStorage on mount
   useLocalStorage(STORAGE_KEYS.couple(result.slug), result.coupleSecret);
 
-  const [copiedGuest, setCopiedGuest] = useState(false);
-  const [copiedCouple, setCopiedCouple] = useState(false);
-
   const shareableLink = `${window.location.origin}/e/${result.slug}`;
   const coupleLink = `${shareableLink}?s=${result.coupleSecret}`;
-
-  function handleCopyGuest() {
-    navigator.clipboard.writeText(shareableLink);
-    setCopiedGuest(true);
-    setTimeout(() => setCopiedGuest(false), 2000);
-  }
-
-  function handleCopyCouple() {
-    navigator.clipboard.writeText(coupleLink);
-    setCopiedCouple(true);
-    setTimeout(() => setCopiedCouple(false), 2000);
-  }
 
   return (
     <div className="w-full max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -84,18 +65,7 @@ export function EventCreateSuccess({
             value={shareableLink}
             className="bg-card border-border text-foreground text-sm font-mono"
           />
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleCopyGuest}
-            className="shrink-0 text-muted-foreground"
-          >
-            {copiedGuest ? (
-              <CheckIcon className="size-4 text-emerald-400" />
-            ) : (
-              <CopyIcon className="size-4" />
-            )}
-          </Button>
+          <CopyButton value={shareableLink} />
         </div>
       </div>
 
@@ -111,18 +81,7 @@ export function EventCreateSuccess({
             value={coupleLink}
             className="bg-card border-border text-foreground text-sm font-mono"
           />
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleCopyCouple}
-            className="shrink-0 text-muted-foreground"
-          >
-            {copiedCouple ? (
-              <CheckIcon className="size-4 text-emerald-400" />
-            ) : (
-              <CopyIcon className="size-4" />
-            )}
-          </Button>
+          <CopyButton value={coupleLink} />
         </div>
         <p className="text-muted-foreground/60 text-xs mt-2 leading-relaxed">
           Bookmark this — use it to manage photo visibility.
