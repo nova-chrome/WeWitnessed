@@ -9,6 +9,7 @@ import { ThemeToggle } from "~/components/theme-toggle";
 import { api } from "~/convex/_generated/api";
 import { EventShareDialog } from "~/features/events/components/event-share-dialog";
 import { useCoupleSession } from "~/features/events/hooks/use-couple-session";
+import { useGuestSession } from "~/features/guests/hooks/use-guest-session";
 import { cn } from "~/lib/utils";
 import { PhotoLightbox } from "./photo-lightbox";
 import type { ViewMode } from "./view-toggle";
@@ -22,6 +23,7 @@ interface EventGalleryViewProps {
 export function EventGalleryView({ slug }: EventGalleryViewProps) {
   const event = useQuery(api.events.getBySlug, { slug });
   const couple = useCoupleSession(slug, event?._id);
+  const guest = useGuestSession(slug, event?._id);
 
   const photos = useQuery(
     api.photos.getByEvent,
@@ -219,12 +221,21 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
           selectedIndex={selectedPhotoIndex}
           onClose={handleLightboxClose}
           onNavigate={setSelectedPhotoIndex}
+          eventId={event._id}
           couple={
             couple.isCouple && couple.coupleSecret
               ? {
                   isCouple: true,
                   coupleSecret: couple.coupleSecret,
                   eventId: event._id,
+                }
+              : undefined
+          }
+          guest={
+            guest.guestId
+              ? {
+                  guestId: guest.guestId,
+                  deviceId: guest.deviceId,
                 }
               : undefined
           }

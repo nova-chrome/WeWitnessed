@@ -16,12 +16,14 @@ import {
 } from "~/components/ui/dialog";
 import type { Id } from "~/convex/_generated/dataModel";
 import { cn } from "~/lib/utils";
+import { DeletePhotoButton } from "./delete-photo-button";
 import { VisibilityToggle } from "./visibility-toggle";
 
 interface Photo {
   _id: Id<"photos">;
   url: string | null;
   isPublic: boolean;
+  guestId?: Id<"guests">;
 }
 
 interface CoupleInfo {
@@ -30,12 +32,29 @@ interface CoupleInfo {
   eventId: Id<"events">;
 }
 
+interface GuestInfo {
+  guestId: Id<"guests">;
+  deviceId: string;
+}
+
 interface PhotoLightboxProps {
   photos: Photo[];
   selectedIndex: number | null;
   onClose: () => void;
   onNavigate: (index: number) => void;
+  eventId: Id<"events">;
   couple?: CoupleInfo;
+  guest?: GuestInfo;
+}
+
+function canDeletePhoto(
+  photo: Photo,
+  couple?: CoupleInfo,
+  guest?: GuestInfo,
+): boolean {
+  if (couple?.isCouple) return true;
+  if (guest?.guestId && photo.guestId === guest.guestId) return true;
+  return false;
 }
 
 export function PhotoLightbox({
@@ -43,7 +62,9 @@ export function PhotoLightbox({
   selectedIndex,
   onClose,
   onNavigate,
+  eventId,
   couple,
+  guest,
 }: PhotoLightboxProps) {
   const photo = selectedIndex !== null ? photos[selectedIndex] : null;
   const hasPrev = selectedIndex !== null && selectedIndex > 0;
@@ -59,6 +80,17 @@ export function PhotoLightbox({
     a.download = `photo-${photo._id}.jpg`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  function handlePhotoDeleted() {
+    if (selectedIndex === null) return;
+    if (photos.length <= 1) {
+      onClose();
+      return;
+    }
+    if (selectedIndex >= photos.length - 1) {
+      onNavigate(selectedIndex - 1);
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -172,6 +204,18 @@ export function PhotoLightbox({
             >
               <DownloadIcon className="size-5" />
             </button>
+          )}
+
+          {/* Delete button */}
+          {photo && canDeletePhoto(photo, couple, guest) && (
+            <DeletePhotoButton
+              photoId={photo._id}
+              eventId={eventId}
+              coupleSecret={couple?.coupleSecret}
+              deviceId={guest?.deviceId}
+              onDeleted={handlePhotoDeleted}
+              className="bottom-4 left-4"
+            />
           )}
 
           {/* Visibility toggle for couple view */}

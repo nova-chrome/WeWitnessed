@@ -54,6 +54,26 @@ export async function getPublicEventPhotos(
   );
 }
 
+export async function deletePhoto(
+  ctx: MutationCtx,
+  photoId: Id<"photos">,
+  eventId: Id<"events">,
+): Promise<void> {
+  const photo = await ctx.db.get(photoId);
+  if (!photo) {
+    throw new ConvexError({ code: "NotFound", message: "Photo not found" });
+  }
+  if (photo.eventId !== eventId) {
+    throw new ConvexError({
+      code: "Forbidden",
+      message: "Photo does not belong to this event",
+    });
+  }
+
+  await ctx.storage.delete(photo.storageId);
+  await ctx.db.delete(photoId);
+}
+
 export async function togglePhotoVisibility(
   ctx: MutationCtx,
   photoId: Id<"photos">,
