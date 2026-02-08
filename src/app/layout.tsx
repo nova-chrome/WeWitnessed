@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
 import { PropsWithChildren } from "react";
-import { Toaster } from "~/components/ui/sonner";
 import { ConvexProvider } from "~/components/convex-provider";
 import { PWARegister } from "~/components/pwa-register";
 import { ThemeProvider } from "~/components/theme-provider";
+import { Toaster } from "~/components/ui/sonner";
 import { cn } from "~/lib/utils";
 import "./globals.css";
 
@@ -29,6 +29,7 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
   return (
     <html lang="en" className={nunitoSans.variable} suppressHydrationWarning>
       <body
+        suppressHydrationWarning
         className={cn(geistSans.variable, geistMono.variable, "antialiased")}
       >
         <ThemeProvider>
