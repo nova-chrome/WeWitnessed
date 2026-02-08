@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { cn } from "~/lib/utils";
 import { useCamera } from "../hooks/use-camera";
 import { CameraControls } from "./camera-controls";
 import { CameraSettings } from "./camera-settings";
@@ -21,6 +22,7 @@ export function CameraScreen({
     isReady,
     error,
     zoomLevel,
+    facingMode,
     isCapturing,
     toggleCamera,
     setZoom,
@@ -37,13 +39,20 @@ export function CameraScreen({
   return (
     <div className="relative w-full h-svh bg-background overflow-hidden">
       {/* Full-screen Camera Preview */}
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted
-        className="absolute inset-0 w-full h-full object-cover"
-      />
+      <div
+        className={cn(
+          "absolute inset-0 w-full h-full",
+          facingMode === "user" && "-scale-x-100",
+        )}
+      >
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
 
       {/* Flash Effect */}
       {isCapturing && (

@@ -135,6 +135,12 @@ export function useCamera(): Camera {
       return null;
     }
 
+    // Mirror the captured image for front camera to match the preview
+    if (state.facingMode === "user") {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
+
     ctx.drawImage(video, 0, 0);
 
     const blob = await new Promise<Blob | null>((resolve) => {
@@ -146,7 +152,7 @@ export function useCamera(): Camera {
     setState((prev) => ({ ...prev, isCapturing: false }));
 
     return blob;
-  }, [state.isReady]);
+  }, [state.isReady, state.facingMode]);
 
   // Initialize camera on mount
   useEffect(() => {
