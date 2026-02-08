@@ -1,23 +1,11 @@
 "use client";
 
-import { useCallback, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
+import { useCallback, useState } from "react";
 import { api } from "../../../../convex/_generated/api";
 import type { Id } from "../../../../convex/_generated/dataModel";
-
-const DEVICE_ID_KEY = "wewitnessed:deviceId";
-const GUEST_KEY_PREFIX = "wewitnessed:guest:";
-
-function getOrCreateDeviceId(): string {
-  if (typeof window === "undefined") return "";
-
-  const existing = localStorage.getItem(DEVICE_ID_KEY);
-  if (existing) return existing;
-
-  const deviceId = crypto.randomUUID();
-  localStorage.setItem(DEVICE_ID_KEY, deviceId);
-  return deviceId;
-}
+import { useLocalStorage } from "~/hooks/use-local-storage";
+import { STORAGE_KEYS } from "~/lib/storage-keys";
 
 interface GuestSession {
   guestId: Id<"guests"> | null;
@@ -31,7 +19,8 @@ export function useGuestSession(
   slug: string,
   eventId: Id<"events"> | undefined,
 ): GuestSession {
-  const [deviceId] = useState(getOrCreateDeviceId);
+  const [fallbackDeviceId] = useState(() => crypto.randomUUID());
+  const [deviceId] = useLocalStorage(STORAGE_KEYS.DEVICE_ID, fallbackDeviceId);
   const createGuestMutation = useMutation(api.guests.create);
 
   const existingGuest = useQuery(
@@ -39,16 +28,13 @@ export function useGuestSession(
     eventId && deviceId ? { eventId, deviceId } : "skip",
   );
 
-  // Check localStorage for cached guestId (faster than waiting for query)
-  const [cachedGuestId] = useState<Id<"guests"> | null>(() => {
-    if (typeof window === "undefined") return null;
-    const stored = localStorage.getItem(`${GUEST_KEY_PREFIX}${slug}`);
-    return stored ? (stored as Id<"guests">) : null;
-  });
+  const [cachedGuestId, setCachedGuestId] = useLocalStorage<Id<"guests"> | null>(
+    STORAGE_KEYS.guest(slug),
+    null,
+  );
 
   const guestId = existingGuest?._id ?? cachedGuestId;
   const guestName = existingGuest?.name ?? null;
-
   const isReady = deviceId !== "" && existingGuest !== undefined;
 
   const createGuest = useCallback(
@@ -62,10 +48,10 @@ export function useGuestSession(
         deviceId,
       });
 
-      localStorage.setItem(`${GUEST_KEY_PREFIX}${slug}`, id);
+      setCachedGuestId(id);
       return id;
     },
-    [eventId, deviceId, slug, createGuestMutation],
+    [eventId, deviceId, createGuestMutation, setCachedGuestId],
   );
 
   return {

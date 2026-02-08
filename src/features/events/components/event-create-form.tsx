@@ -74,8 +74,6 @@ export function EventCreateForm() {
         coupleSecret,
       });
 
-      localStorage.setItem(`wewitnessed:couple:${res.slug}`, res.coupleSecret);
-
       setResult(res);
       setStatus("success");
     },

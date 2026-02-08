@@ -8,8 +8,10 @@ import {
 import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
+import { useLocalStorage } from "~/hooks/use-local-storage";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { STORAGE_KEYS } from "~/lib/storage-keys";
 import type { CreateEventResult } from "../types/event";
 
 interface EventCreateSuccessProps {
@@ -23,6 +25,9 @@ export function EventCreateSuccess({
   eventName,
   onReset,
 }: EventCreateSuccessProps) {
+  // Persist couple secret to localStorage on mount
+  useLocalStorage(STORAGE_KEYS.couple(result.slug), result.coupleSecret);
+
   const [copiedGuest, setCopiedGuest] = useState(false);
   const [copiedCouple, setCopiedCouple] = useState(false);
 

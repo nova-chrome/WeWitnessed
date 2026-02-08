@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import type { Id } from "../../../../convex/_generated/dataModel";
-
-const COUPLE_KEY_PREFIX = "wewitnessed:couple:";
+import { useLocalStorage } from "~/hooks/use-local-storage";
+import { STORAGE_KEYS } from "~/lib/storage-keys";
 
 function readSecretFromUrl(): string | null {
   if (typeof window === "undefined") return null;
@@ -23,24 +23,21 @@ export function useCoupleSession(
   slug: string,
   eventId: Id<"events"> | undefined,
 ): CoupleSession {
-  const [coupleSecret] = useState<string | null>(() => {
+  const [coupleSecret, setCoupleSecret, removeCoupleSecret] = useLocalStorage<string | null>(
+    STORAGE_KEYS.couple(slug),
+    null,
+  );
+
+  // Persist secret from URL and clean the search param
+  useEffect(() => {
     const fromUrl = readSecretFromUrl();
     if (fromUrl) {
-      localStorage.setItem(`${COUPLE_KEY_PREFIX}${slug}`, fromUrl);
-      return fromUrl;
-    }
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(`${COUPLE_KEY_PREFIX}${slug}`);
-  });
-
-  // Clean secret from URL after mount
-  useEffect(() => {
-    if (readSecretFromUrl()) {
+      setCoupleSecret(fromUrl);
       const url = new URL(window.location.href);
       url.searchParams.delete("s");
       window.history.replaceState({}, "", url.toString());
     }
-  }, []);
+  }, [setCoupleSecret]);
 
   const isVerified = useQuery(
     api.events.verifyCoupleSecret,
@@ -49,9 +46,9 @@ export function useCoupleSession(
 
   useEffect(() => {
     if (isVerified === false && coupleSecret) {
-      localStorage.removeItem(`${COUPLE_KEY_PREFIX}${slug}`);
+      removeCoupleSecret();
     }
-  }, [isVerified, coupleSecret, slug]);
+  }, [isVerified, coupleSecret, removeCoupleSecret]);
 
   return {
     isCouple: isVerified === true,
