@@ -1,15 +1,19 @@
 "use client";
 
-import { useMutation, useQuery } from "convex/react";
-import { CameraIcon, EyeIcon, EyeOffIcon, KeyRoundIcon } from "lucide-react";
+import { useQuery } from "convex/react";
+import { CameraIcon, KeyRoundIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { api } from "~/convex/_generated/api";
-import type { Id } from "~/convex/_generated/dataModel";
 import { EventShareDialog } from "~/features/events/components/event-share-dialog";
 import { useCoupleSession } from "~/features/events/hooks/use-couple-session";
 import { cn } from "~/lib/utils";
+import { PhotoLightbox } from "./photo-lightbox";
+import type { ViewMode } from "./view-toggle";
+import { ViewToggle } from "./view-toggle";
+import { VisibilityToggle } from "./visibility-toggle";
 
 interface EventGalleryViewProps {
   slug: string;
@@ -28,6 +32,23 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
         }
       : "skip",
   );
+
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
+    null,
+  );
+
+  function handlePhotoClick(index: number) {
+    setSelectedPhotoIndex(index);
+  }
+
+  function handleLightboxClose() {
+    setSelectedPhotoIndex(null);
+  }
+
+  function toggleViewMode() {
+    setViewMode((prev) => (prev === "grid" ? "list" : "grid"));
+  }
 
   if (event === undefined) {
     return (
@@ -78,8 +99,11 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
           </div>
         )}
 
-        {/* Theme toggle */}
-        <div className="absolute top-4 right-4 z-10">
+        {/* View toggle + Theme toggle */}
+        <div className="absolute top-4 right-4 z-10 flex items-center gap-1">
+          {hasPhotos && (
+            <ViewToggle viewMode={viewMode} onToggle={toggleViewMode} />
+          )}
           <ThemeToggle />
         </div>
 
@@ -119,23 +143,57 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-0.5">
-            {photos.map((photo) =>
+          <div
+            className={cn(
+              viewMode === "grid"
+                ? "grid grid-cols-3 gap-0.5"
+                : "flex flex-col gap-2 max-w-lg mx-auto",
+            )}
+          >
+            {photos.map((photo, index) =>
               photo.url ? (
                 <div
                   key={photo._id}
-                  className="relative aspect-square overflow-hidden"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handlePhotoClick(index)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handlePhotoClick(index);
+                    }
+                  }}
+                  className={cn(
+                    "relative overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500",
+                    viewMode === "grid"
+                      ? "aspect-square"
+                      : "rounded-sm",
+                  )}
                 >
-                  <Image
-                    src={photo.url}
-                    alt=""
-                    fill
-                    sizes="33vw"
-                    className={cn(
-                      "object-cover",
-                      couple.isCouple && !photo.isPublic && "opacity-50",
-                    )}
-                  />
+                  {viewMode === "grid" ? (
+                    <Image
+                      src={photo.url}
+                      alt=""
+                      fill
+                      sizes="33vw"
+                      className={cn(
+                        "object-cover",
+                        couple.isCouple && !photo.isPublic && "opacity-50",
+                      )}
+                    />
+                  ) : (
+                    <Image
+                      src={photo.url}
+                      alt=""
+                      width={600}
+                      height={600}
+                      sizes="(max-width: 512px) 100vw, 512px"
+                      className={cn(
+                        "w-full h-auto",
+                        couple.isCouple && !photo.isPublic && "opacity-50",
+                      )}
+                    />
+                  )}
                   {couple.isCouple && !photo.isPublic && (
                     <div className="absolute inset-0 bg-black/30 pointer-events-none" />
                   )}
@@ -154,53 +212,36 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
         )}
       </div>
 
-      {/* Camera FAB */}
-      <Link
-        href={`/e/${slug}/camera`}
-        className="fixed bottom-6 right-6 z-10 flex items-center justify-center size-14 rounded-full bg-linear-to-br from-purple-500 to-purple-600 shadow-lg shadow-purple-500/25 transition-transform active:scale-95"
-        aria-label="Take a photo"
-      >
-        <CameraIcon className="size-6 text-white" />
-      </Link>
+      {/* Photo Lightbox */}
+      {hasPhotos && (
+        <PhotoLightbox
+          photos={photos}
+          selectedIndex={selectedPhotoIndex}
+          onClose={handleLightboxClose}
+          onNavigate={setSelectedPhotoIndex}
+          couple={
+            couple.isCouple && couple.coupleSecret
+              ? {
+                  isCouple: true,
+                  coupleSecret: couple.coupleSecret,
+                  eventId: event._id,
+                }
+              : undefined
+          }
+        />
+      )}
+
+      {/* Camera FAB — hidden when lightbox is open */}
+      {selectedPhotoIndex === null && (
+        <Link
+          href={`/e/${slug}/camera`}
+          className="fixed bottom-6 right-6 z-10 flex items-center justify-center size-14 rounded-full bg-linear-to-br from-purple-500 to-purple-600 shadow-lg shadow-purple-500/25 transition-transform active:scale-95"
+          aria-label="Take a photo"
+        >
+          <CameraIcon className="size-6 text-white" />
+        </Link>
+      )}
     </div>
   );
 }
 
-function VisibilityToggle({
-  photoId,
-  eventId,
-  coupleSecret,
-  isPublic,
-}: {
-  photoId: Id<"photos">;
-  eventId: Id<"events">;
-  coupleSecret: string;
-  isPublic: boolean;
-}) {
-  const toggleVisibility = useMutation(api.photos.toggleVisibility);
-
-  async function handleToggle() {
-    await toggleVisibility({ photoId, eventId, coupleSecret });
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={handleToggle}
-      className={cn(
-        "absolute top-2 right-2 z-10 flex items-center justify-center",
-        "size-8 rounded-full backdrop-blur-md transition-all active:scale-90",
-        isPublic
-          ? "bg-white/20 text-white"
-          : "bg-black/60 text-muted-foreground",
-      )}
-      aria-label={isPublic ? "Make private" : "Make public"}
-    >
-      {isPublic ? (
-        <EyeIcon className="size-4" />
-      ) : (
-        <EyeOffIcon className="size-4" />
-      )}
-    </button>
-  );
-}
