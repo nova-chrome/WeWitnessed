@@ -1,7 +1,12 @@
 "use client";
 
 import { Dialog as DialogPrimitive } from "radix-ui";
-import { ChevronLeftIcon, ChevronRightIcon, XIcon } from "lucide-react";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DownloadIcon,
+  XIcon,
+} from "lucide-react";
 import Image from "next/image";
 import {
   Dialog,
@@ -43,6 +48,18 @@ export function PhotoLightbox({
   const photo = selectedIndex !== null ? photos[selectedIndex] : null;
   const hasPrev = selectedIndex !== null && selectedIndex > 0;
   const hasNext = selectedIndex !== null && selectedIndex < photos.length - 1;
+
+  async function handleDownload() {
+    if (!photo?.url) return;
+    const response = await fetch(photo.url);
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `photo-${photo._id}.jpg`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (selectedIndex === null) return;
@@ -139,6 +156,22 @@ export function PhotoLightbox({
                 priority
               />
             </div>
+          )}
+
+          {/* Download button */}
+          {photo?.url && (
+            <button
+              type="button"
+              onClick={handleDownload}
+              className={cn(
+                "absolute bottom-4 right-4 z-10 flex items-center justify-center",
+                "size-10 rounded-full bg-black/40 text-white backdrop-blur-md",
+                "transition-all active:scale-90",
+              )}
+              aria-label="Download photo"
+            >
+              <DownloadIcon className="size-5" />
+            </button>
           )}
 
           {/* Visibility toggle for couple view */}
