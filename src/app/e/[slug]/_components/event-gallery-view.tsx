@@ -14,6 +14,7 @@ import type { Id } from "../../../../../convex/_generated/dataModel";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { cn } from "~/lib/utils";
 import { useCoupleSession } from "~/features/events/hooks/use-couple-session";
+import { EventShareDialog } from "~/features/events/components/event-share-dialog";
 
 interface EventGalleryViewProps {
   slug: string;
@@ -71,6 +72,13 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
 
       {/* Header */}
       <div className="relative pt-safe-or-4 px-4 pb-4">
+        {/* Couple share button */}
+        {couple.isCouple && couple.coupleSecret && (
+          <div className="absolute top-4 left-4 z-10">
+            <EventShareDialog slug={slug} coupleSecret={couple.coupleSecret} />
+          </div>
+        )}
+
         {/* Theme toggle */}
         <div className="absolute top-4 right-4 z-10">
           <ThemeToggle />
