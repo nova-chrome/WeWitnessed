@@ -3,7 +3,13 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "convex/react";
 import { format, startOfDay } from "date-fns";
-import { CalendarIcon, Loader2Icon, SparklesIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  KeyRoundIcon,
+  LinkIcon,
+  Loader2Icon,
+  SparklesIcon,
+} from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -22,9 +28,21 @@ import { EventCreateSuccess } from "./event-create-success";
 
 type Status = "idle" | "submitting" | "success";
 
+const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]*[a-z0-9]$/;
+
+const optionalSlugLike = z.string().refine(
+  (v) => {
+    const s = v.trim().toLowerCase();
+    return s === "" || (s.length >= 3 && s.length <= 40 && SLUG_PATTERN.test(s));
+  },
+  "3-40 chars, lowercase letters, numbers, and hyphens only (no leading/trailing hyphens)",
+);
+
 const EventCreateFormSchema = z.object({
   name: z.string().trim().min(1, "Event name is required"),
   date: z.date().or(z.undefined()),
+  slug: optionalSlugLike,
+  coupleSecret: optionalSlugLike,
 });
 
 export function EventCreateForm() {
@@ -37,6 +55,8 @@ export function EventCreateForm() {
     defaultValues: {
       name: "",
       date: undefined as Date | undefined,
+      slug: "",
+      coupleSecret: "",
     },
     validators: {
       onSubmit: EventCreateFormSchema,
@@ -45,9 +65,13 @@ export function EventCreateForm() {
       setStatus("submitting");
 
       const dateTimestamp = value.date ? value.date.getTime() : undefined;
+      const slug = value.slug?.trim() || undefined;
+      const coupleSecret = value.coupleSecret || undefined;
       const res = await createEvent({
         name: value.name.trim(),
         date: dateTimestamp,
+        slug,
+        coupleSecret,
       });
 
       localStorage.setItem(`wewitnessed:couple:${res.slug}`, res.coupleSecret);
@@ -153,6 +177,77 @@ export function EventCreateForm() {
               </Popover>
             </Field>
           )}
+        </form.Field>
+
+        <form.Field name="slug">
+          {(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel
+                  htmlFor={field.name}
+                  className="text-muted-foreground text-xs tracking-wider uppercase mb-2"
+                >
+                  <LinkIcon className="size-3 inline-block mr-1.5 -mt-px" />
+                  Custom URL{" "}
+                  <span className="text-muted-foreground/60 normal-case tracking-normal">
+                    (optional)
+                  </span>
+                </FieldLabel>
+                <div className="flex items-center gap-0">
+                  <span className="shrink-0 h-12 inline-flex items-center rounded-l-md border border-r-0 border-border bg-muted px-3 text-sm text-muted-foreground">
+                    /e/
+                  </span>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    type="text"
+                    placeholder="sarah-and-mike"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                    aria-invalid={isInvalid}
+                    className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 h-12 text-base rounded-l-none"
+                  />
+                </div>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
+
+        <form.Field name="coupleSecret">
+          {(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel
+                  htmlFor={field.name}
+                  className="text-muted-foreground text-xs tracking-wider uppercase mb-2"
+                >
+                  <KeyRoundIcon className="size-3 inline-block mr-1.5 -mt-px" />
+                  Custom Secret{" "}
+                  <span className="text-muted-foreground/60 normal-case tracking-normal">
+                    (optional)
+                  </span>
+                </FieldLabel>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  type="text"
+                  placeholder="your-memorable-passphrase"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  aria-invalid={isInvalid}
+                  className="bg-card border-border text-foreground placeholder:text-muted-foreground/60 h-12 text-base"
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
         </form.Field>
       </div>
 

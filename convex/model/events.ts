@@ -31,6 +31,69 @@ export function generateCoupleSecret(): string {
   return generateRandomString(32);
 }
 
+const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]*[a-z0-9]$/;
+
+export async function resolveSlug(
+  ctx: MutationCtx,
+  customSlug?: string,
+): Promise<string> {
+  if (!customSlug) return generateUniqueSlug(ctx);
+
+  const slug = customSlug.toLowerCase().trim();
+
+  if (slug.length < 3 || slug.length > 40) {
+    throw new ConvexError({
+      code: "BadRequest",
+      message: "Slug must be between 3 and 40 characters",
+    });
+  }
+
+  if (!SLUG_PATTERN.test(slug)) {
+    throw new ConvexError({
+      code: "BadRequest",
+      message:
+        "Slug can only contain lowercase letters, numbers, and hyphens (no leading/trailing hyphens)",
+    });
+  }
+
+  const existing = await ctx.db
+    .query("events")
+    .withIndex("by_slug", (q) => q.eq("slug", slug))
+    .first();
+
+  if (existing) {
+    throw new ConvexError({
+      code: "Conflict",
+      message: "This URL is already taken",
+    });
+  }
+
+  return slug;
+}
+
+export function resolveCoupleSecret(customSecret?: string): string {
+  if (!customSecret) return generateCoupleSecret();
+
+  const secret = customSecret.toLowerCase().trim();
+
+  if (secret.length < 3 || secret.length > 40) {
+    throw new ConvexError({
+      code: "BadRequest",
+      message: "Secret must be between 3 and 40 characters",
+    });
+  }
+
+  if (!SLUG_PATTERN.test(secret)) {
+    throw new ConvexError({
+      code: "BadRequest",
+      message:
+        "Secret can only contain lowercase letters, numbers, and hyphens (no leading/trailing hyphens)",
+    });
+  }
+
+  return secret;
+}
+
 export async function getEventBySlug(ctx: QueryCtx, slug: string) {
   return ctx.db
     .query("events")

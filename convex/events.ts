@@ -6,6 +6,8 @@ export const create = mutation({
   args: {
     name: v.string(),
     date: v.optional(v.number()),
+    slug: v.optional(v.string()),
+    coupleSecret: v.optional(v.string()),
   },
   returns: v.object({
     id: v.id("events"),
@@ -13,8 +15,8 @@ export const create = mutation({
     coupleSecret: v.string(),
   }),
   handler: async (ctx, args) => {
-    const slug = await Events.generateUniqueSlug(ctx);
-    const coupleSecret = Events.generateCoupleSecret();
+    const slug = await Events.resolveSlug(ctx, args.slug);
+    const coupleSecret = Events.resolveCoupleSecret(args.coupleSecret);
 
     const id = await ctx.db.insert("events", {
       name: args.name,
