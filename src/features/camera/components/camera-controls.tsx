@@ -27,7 +27,7 @@ export function CameraControls({
   return (
     <div className="absolute inset-0 flex flex-col justify-center items-center pb-safe-or-6">
       {/* Time Display */}
-      <div className="mb-6 text-muted-foreground dark:text-foreground text-4xl font-light tabular-nums">
+      <div className="mb-6 text-white text-4xl font-light tabular-nums drop-shadow-md">
         {currentTime}
       </div>
 
@@ -38,7 +38,7 @@ export function CameraControls({
           className="flex items-center justify-center size-12 rounded-full transition-all hover:bg-foreground/10 active:scale-95"
           aria-label="Settings"
         >
-          <SettingsIcon className="size-6 text-muted-foreground dark:text-foreground" />
+          <SettingsIcon className="size-6 text-white drop-shadow-md" />
         </button>
 
         {/* Capture Button */}
@@ -59,10 +59,10 @@ export function CameraControls({
 
         {/* Gallery */}
         <button
-          className="flex items-center justify-center size-12 rounded-full border-2 border-muted-foreground/30 dark:border-foreground/30 transition-all hover:bg-foreground/10 active:scale-95 overflow-hidden"
+          className="flex items-center justify-center size-12 rounded-full border-2 border-white/50 transition-all hover:bg-white/10 active:scale-95 overflow-hidden"
           aria-label="Open gallery"
         >
-          <ImageIcon className="size-6 text-muted-foreground dark:text-foreground" />
+          <ImageIcon className="size-6 text-white drop-shadow-md" />
         </button>
       </div>
     </div>
