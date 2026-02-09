@@ -55,6 +55,18 @@ export const update = mutation({
   },
 });
 
+export const remove = mutation({
+  args: {
+    eventId: v.id("events"),
+    coupleSecret: v.string(),
+  },
+  returns: v.null(),
+  handler: async (ctx, { eventId, coupleSecret }) => {
+    await Events.deleteEvent(ctx, eventId, coupleSecret);
+    return null;
+  },
+});
+
 export const getBySlug = query({
   args: { slug: v.string() },
   returns: v.union(

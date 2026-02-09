@@ -36,7 +36,7 @@ Mid-May 2025 (cousin's wedding)
 - Multiple events per couple
 - Payment / monetization
 - ~~Event editing after creation~~ → Done (post-MVP 1.1)
-- Event deletion
+- ~~Event deletion~~ → Done (post-MVP 1.2)
 
 ## Build Order (completed)
 
