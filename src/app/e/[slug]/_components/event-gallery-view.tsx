@@ -14,7 +14,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { api } from "~/convex/_generated/api";
-import { EventEditDialog } from "~/features/events/components/event-edit-dialog";
+import { EventEditDrawer } from "~/features/events/components/event-edit-drawer";
 import { EventShareDialog } from "~/features/events/components/event-share-dialog";
 import { useCoupleSession } from "~/features/events/hooks/use-couple-session";
 import { useGuestSession } from "~/features/guests/hooks/use-guest-session";
@@ -336,9 +336,9 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
         </Link>
       )}
 
-      {/* Edit Event Dialog (couple only) */}
+      {/* Edit Event Drawer (couple only) */}
       {couple.isCouple && couple.coupleSecret && (
-        <EventEditDialog
+        <EventEditDrawer
           open={editOpen}
           onOpenChange={setEditOpen}
           eventId={event._id}

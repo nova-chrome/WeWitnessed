@@ -31,6 +31,7 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
       <body
         suppressHydrationWarning
         className={cn(geistSans.variable, geistMono.variable, "antialiased")}
+        vaul-drawer-wrapper=""
       >
         <ThemeProvider>
           <ConvexProvider>{children}</ConvexProvider>
