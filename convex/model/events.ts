@@ -134,6 +134,48 @@ export async function updateEvent(
   await ctx.db.patch(eventId, patch);
 }
 
+export async function setCoverPhoto(
+  ctx: MutationCtx,
+  eventId: Id<"events">,
+  coupleSecret: string,
+  storageId: Id<"_storage">,
+): Promise<void> {
+  const isValid = await verifyCoupleSecret(ctx, eventId, coupleSecret);
+  if (!isValid) {
+    throw new ConvexError({
+      code: "Forbidden",
+      message: "Invalid couple secret",
+    });
+  }
+
+  const event = await ctx.db.get(eventId);
+  if (event?.coverPhotoStorageId) {
+    await ctx.storage.delete(event.coverPhotoStorageId);
+  }
+
+  await ctx.db.patch(eventId, { coverPhotoStorageId: storageId });
+}
+
+export async function removeCoverPhoto(
+  ctx: MutationCtx,
+  eventId: Id<"events">,
+  coupleSecret: string,
+): Promise<void> {
+  const isValid = await verifyCoupleSecret(ctx, eventId, coupleSecret);
+  if (!isValid) {
+    throw new ConvexError({
+      code: "Forbidden",
+      message: "Invalid couple secret",
+    });
+  }
+
+  const event = await ctx.db.get(eventId);
+  if (event?.coverPhotoStorageId) {
+    await ctx.storage.delete(event.coverPhotoStorageId);
+    await ctx.db.patch(eventId, { coverPhotoStorageId: undefined });
+  }
+}
+
 export async function deleteEvent(
   ctx: MutationCtx,
   eventId: Id<"events">,
