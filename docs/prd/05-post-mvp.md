@@ -97,15 +97,17 @@ Small improvements to tighten the existing MVP before adding new features.
 
 ---
 
-### 1.6 Camera Permission UX
+### 1.6 Camera Permission UX ✅
 
-**What**: Better guidance when camera access is denied.
+**Status**: Complete
 
-**Where to build**: `src/features/camera/components/camera-screen.tsx` — the error state.
+**What was built**:
 
-**What exists**: Camera hook (`useCamera`) catches errors and sets an error state string. Camera screen shows error text.
+- New utility `src/features/camera/utils/camera-permissions.ts` with `getDeviceInstructions()` (detects iOS Safari, iOS Chrome, Android, desktop Safari, Firefox, Chromium) and `queryCameraPermission()` (wraps `navigator.permissions.query` with `tryCatch` fallback)
+- Enhanced error state in `src/features/camera/components/camera-screen.tsx` with camera icon, device-specific instruction text, and "Try Again" button
+- Exposed `retryCamera` on `useCamera` hook to allow re-requesting camera access from the UI
 
-**Acceptance criteria**:
+**Acceptance criteria** (all met):
 - Show device-specific instructions ("Open Settings > Safari > Camera" on iOS)
 - Include a "Try Again" button that re-requests permission
 - Detect permission state via `navigator.permissions.query` if available

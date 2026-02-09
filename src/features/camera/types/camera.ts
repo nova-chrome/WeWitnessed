@@ -18,4 +18,5 @@ export interface CameraControls {
   setZoom: (level: ZoomLevel) => void;
   toggleFlash: () => void;
   capture: () => Promise<Blob | null>;
+  retryCamera: (facingMode: FacingMode) => void;
 }
