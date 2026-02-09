@@ -1,7 +1,13 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { CameraIcon, KeyRoundIcon, PencilIcon } from "lucide-react";
+import {
+  CameraIcon,
+  HeartIcon,
+  KeyRoundIcon,
+  PencilIcon,
+  Share2Icon,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -148,15 +154,62 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
       <div className="relative px-2 pb-24">
         {!hasPhotos ? (
           <div className="flex flex-col items-center justify-center py-24 px-6">
-            <div className="flex items-center justify-center size-16 rounded-full bg-muted mb-4">
-              <CameraIcon className="size-7 text-muted-foreground" />
+            <div className="flex items-center justify-center size-16 rounded-full bg-muted mb-6 animate-in fade-in zoom-in-75 duration-500">
+              <HeartIcon className="size-7 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground text-center text-sm tracking-wide mb-1">
-              No photos yet
-            </p>
-            <p className="text-muted-foreground/60 text-center text-xs tracking-wide">
-              Be the first to capture a moment!
-            </p>
+
+            {couple.isCouple && couple.coupleSecret ? (
+              <div className="flex flex-col items-center animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 fill-mode-both">
+                <p className="text-foreground text-center text-sm font-light tracking-wide mb-1.5">
+                  Your gallery is ready for memories
+                </p>
+                <p className="text-muted-foreground/60 text-center text-xs tracking-wide max-w-[240px] mb-6">
+                  Share the link with your guests so they can start capturing
+                  moments
+                </p>
+                <EventShareDialog
+                  slug={slug}
+                  coupleSecret={couple.coupleSecret}
+                  className="size-auto rounded-full px-4 py-2 bg-foreground/5 hover:bg-foreground/10"
+                >
+                  <Share2Icon className="size-3.5" />
+                  <span className="text-xs tracking-wide">Invite guests</span>
+                </EventShareDialog>
+              </div>
+            ) : (
+              <div className="relative flex flex-col items-center animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 fill-mode-both">
+                <p className="text-foreground text-center text-sm font-light tracking-wide mb-1.5">
+                  Every love story deserves great photos
+                </p>
+                <p className="text-muted-foreground/60 text-center text-xs tracking-wide max-w-[220px] mb-8">
+                  Tap the camera below to capture the first moment
+                </p>
+                <div className="animate-bounce-subtle text-purple-500/60">
+                  <svg
+                    width="32"
+                    height="48"
+                    viewBox="0 0 32 48"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="rotate-[25deg]"
+                  >
+                    <path
+                      d="M8 4C8 4 4 20 12 32C18 40 26 42 28 44"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M22 40L28 44L24 38"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div
@@ -181,9 +234,7 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
                   }}
                   className={cn(
                     "relative overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500",
-                    viewMode === "grid"
-                      ? "aspect-square"
-                      : "rounded-sm",
+                    viewMode === "grid" ? "aspect-square" : "rounded-sm",
                   )}
                 >
                   {viewMode === "grid" ? (
@@ -281,4 +332,3 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
     </div>
   );
 }
-

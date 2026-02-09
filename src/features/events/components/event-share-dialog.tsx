@@ -6,6 +6,7 @@ import {
   Share2Icon,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
+import type { PropsWithChildren } from "react";
 import { useRef } from "react";
 import { Button } from "~/components/ui/button";
 import { CopyButton } from "~/components/copy-button";
@@ -31,7 +32,8 @@ export function EventShareDialog({
   slug,
   coupleSecret,
   className,
-}: EventShareDialogProps) {
+  children,
+}: PropsWithChildren<EventShareDialogProps>) {
   const qrRef = useRef<HTMLDivElement>(null);
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
@@ -70,13 +72,14 @@ export function EventShareDialog({
         <button
           type="button"
           className={cn(
-            "inline-flex items-center justify-center size-8 rounded-full",
+            "inline-flex items-center justify-center gap-2",
+            !children && "size-8 rounded-full",
             "text-muted-foreground hover:text-foreground transition-colors",
             className,
           )}
           aria-label="Share event"
         >
-          <Share2Icon className="size-4" />
+          {children ?? <Share2Icon className="size-4" />}
         </button>
       </DialogTrigger>
       <DialogContent className="max-w-xs">
