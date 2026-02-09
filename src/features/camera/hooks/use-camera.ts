@@ -179,5 +179,6 @@ export function useCamera(): Camera {
     setZoom,
     toggleFlash,
     capture,
+    retryCamera: startCamera,
   };
 }
