@@ -41,6 +41,20 @@ export const verifyCoupleSecret = query({
   },
 });
 
+export const update = mutation({
+  args: {
+    eventId: v.id("events"),
+    coupleSecret: v.string(),
+    name: v.optional(v.string()),
+    date: v.optional(v.number()),
+  },
+  returns: v.null(),
+  handler: async (ctx, { eventId, coupleSecret, name, date }) => {
+    await Events.updateEvent(ctx, eventId, coupleSecret, { name, date });
+    return null;
+  },
+});
+
 export const getBySlug = query({
   args: { slug: v.string() },
   returns: v.union(

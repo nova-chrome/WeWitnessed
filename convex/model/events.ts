@@ -110,3 +110,26 @@ export async function verifyCoupleSecret(
   if (!event) return false;
   return event.coupleSecret === coupleSecret;
 }
+
+export async function updateEvent(
+  ctx: MutationCtx,
+  eventId: Id<"events">,
+  coupleSecret: string,
+  fields: { name?: string; date?: number },
+): Promise<void> {
+  const isValid = await verifyCoupleSecret(ctx, eventId, coupleSecret);
+  if (!isValid) {
+    throw new ConvexError({
+      code: "Forbidden",
+      message: "Invalid couple secret",
+    });
+  }
+
+  const patch: Record<string, string | number | undefined> = {};
+  if (fields.name !== undefined) patch.name = fields.name;
+  if (fields.date !== undefined) patch.date = fields.date;
+
+  if (Object.keys(patch).length === 0) return;
+
+  await ctx.db.patch(eventId, patch);
+}

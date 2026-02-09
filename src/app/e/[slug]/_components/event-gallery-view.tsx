@@ -1,12 +1,13 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { CameraIcon, KeyRoundIcon } from "lucide-react";
+import { CameraIcon, KeyRoundIcon, PencilIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { api } from "~/convex/_generated/api";
+import { EventEditDialog } from "~/features/events/components/event-edit-dialog";
 import { EventShareDialog } from "~/features/events/components/event-share-dialog";
 import { useCoupleSession } from "~/features/events/hooks/use-couple-session";
 import { useGuestSession } from "~/features/guests/hooks/use-guest-session";
@@ -39,6 +40,7 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
     null,
   );
+  const [editOpen, setEditOpen] = useState(false);
 
   function handlePhotoClick(index: number) {
     setSelectedPhotoIndex(index);
@@ -113,9 +115,21 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
           <div className="text-3xl font-light text-foreground tracking-tight">
             W
           </div>
-          <h1 className="text-xl font-light text-foreground tracking-tight">
-            {event.name}
-          </h1>
+          <div className="flex items-center gap-1.5">
+            <h1 className="text-xl font-light text-foreground tracking-tight">
+              {event.name}
+            </h1>
+            {couple.isCouple && (
+              <button
+                type="button"
+                onClick={() => setEditOpen(true)}
+                className="inline-flex items-center justify-center size-6 rounded-full text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Edit event"
+              >
+                <PencilIcon className="size-3.5" />
+              </button>
+            )}
+          </div>
           {couple.isCouple && (
             <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/10 px-2.5 py-0.5 text-xs text-purple-400 tracking-wide">
               <KeyRoundIcon className="size-3" />
@@ -251,6 +265,18 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
         >
           <CameraIcon className="size-6 text-white" />
         </Link>
+      )}
+
+      {/* Edit Event Dialog (couple only) */}
+      {couple.isCouple && couple.coupleSecret && (
+        <EventEditDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          eventId={event._id}
+          coupleSecret={couple.coupleSecret}
+          name={event.name}
+          date={event.date}
+        />
       )}
     </div>
   );
