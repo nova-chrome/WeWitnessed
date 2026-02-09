@@ -47,16 +47,19 @@ Small improvements to tighten the existing MVP before adding new features.
 
 ---
 
-### 1.3 Gallery Empty State
+### 1.3 Gallery Empty State ✅
 
-**What**: Improve the empty gallery experience to guide guests.
+**Status**: Complete
 
-**Where to build**: `src/app/e/[slug]/_components/event-gallery-view.tsx` — replace the current "No photos yet" text.
+**What was built**:
+- Role-aware empty state in `src/app/e/[slug]/_components/event-gallery-view.tsx`
+- Guest view: HeartIcon + encouraging message + animated curved arrow pointing to camera FAB
+- Couple view: HeartIcon + message + "Invite guests" button that opens EventShareDialog
+- Extended `EventShareDialog` to accept children for custom trigger rendering
+- Added `bounce-subtle` CSS keyframe animation in `globals.css`
 
-**What exists**: Camera FAB already exists at bottom-right. Gallery view already handles empty photo arrays.
-
-**Acceptance criteria**:
-- Guest sees: encouraging message + arrow/animation pointing to camera FAB
+**Acceptance criteria** (all met):
+- Guest sees: encouraging message + animated arrow pointing to camera FAB
 - Couple sees: message + share button to invite guests
 - Feels warm and wedding-appropriate, not clinical
 

@@ -21,6 +21,7 @@ WeWitnessed lets wedding guests upload photos from their phones to a shared gall
 | Photo deletion (couple + guest own) | Done |
 | PWA (installable) | Done |
 | Dark/light/system theme | Done |
+| Gallery empty state (role-aware) | Done |
 | Offline queue | Designed, not built |
 
 ## 🛠️ Tech Stack
