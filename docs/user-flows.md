@@ -113,8 +113,9 @@ flowchart TD
     J --> J1[QR code download]
     J --> J2[Guest link copy]
     J --> J3[Couple link copy]
-    H --> K[Toggle visibility per photo]
-    H --> L[Delete any photo]
+    H --> K[Edit event name/date → EventEditDialog]
+    H --> L[Toggle visibility per photo]
+    H --> M[Delete any photo]
 ```
 
 ## 7. Guest Deletes Own Photo
@@ -176,5 +177,6 @@ stateDiagram-v2
 | Couple auth | Done | Couple | Visit with `?s=` param | All photos visible, management controls |
 | Toggle visibility | Done | Couple | Tap toggle in lightbox | Photo public/private flipped |
 | Delete photo | Done | Couple / Guest (own) | Tap delete in lightbox | Photo removed from storage + DB |
+| Edit event | Done | Couple | Tap pencil icon next to event name | Name/date updated via dialog |
 | Share event | Done | Couple | Tap share button | Dialog with QR, guest link, couple link |
 | Offline queue | Not built | System | — | See [ADR 002](decisions/002-offline-queue.md) |

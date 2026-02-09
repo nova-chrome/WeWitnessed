@@ -6,7 +6,7 @@ All flows below reflect the current working implementation.
 
 | Actor | How They Authenticate | What They Can Do |
 |-------|----------------------|------------------|
-| Couple | URL secret param `?s=<coupleSecret>` → stored in localStorage | Create event, view all photos (public + private), toggle visibility, delete any photo, share event |
+| Couple | URL secret param `?s=<coupleSecret>` → stored in localStorage | Create event, edit event name/date, view all photos (public + private), toggle visibility, delete any photo, share event |
 | Guest | Device UUID in localStorage + optional name | Upload photos, view public photos, delete own photos, download photos |
 
 ## Flow 1: Couple Creates Event
@@ -100,13 +100,14 @@ Route: /e/{slug}?s={secret}
 3. Secret stored in localStorage, URL param cleaned
 4. Gallery shows all photos (public + private)
 5. Couple can:
+   - Edit event name/date (pencil icon → EventEditDialog with pre-filled form)
    - Toggle any photo public/private (api.photos.toggleVisibility)
    - Delete any photo (api.photos.remove with coupleSecret)
    - Share event via dialog (QR code download, guest link, couple link)
 6. Private photos show dimmed with eye-off icon
 ```
 
-**Implementation:** `useCoupleSession` → `EventShareDialog` → `VisibilityToggle` → `DeletePhotoButton`
+**Implementation:** `useCoupleSession` → `EventEditDialog` → `EventShareDialog` → `VisibilityToggle` → `DeletePhotoButton`
 
 ## Flow 6: Guest Deletes Own Photo
 

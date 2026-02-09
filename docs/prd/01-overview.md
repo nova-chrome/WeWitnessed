@@ -36,6 +36,12 @@ Cousin's wedding, mid-May 2025.
 | PWA installable | Done | Manifest + service worker shell |
 | Dark/light/system theme | Done | next-themes |
 
+## Post-MVP (Completed)
+
+| Capability | Status | Notes |
+|-----------|--------|-------|
+| Event editing (name, date) | Done | Couple-only dialog from gallery header |
+
 ## What It's Not (For Now)
 
 - Not a photo editor

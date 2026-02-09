@@ -10,19 +10,18 @@ Feature sets for building after MVP. Each feature includes enough context to pro
 
 Small improvements to tighten the existing MVP before adding new features.
 
-### 1.1 Event Editing
+### 1.1 Event Editing ✅
 
-**What**: Let the couple edit event name and date after creation.
+**Status**: Complete
 
-**Where to build**:
-- Backend: Add `update` mutation in `convex/events.ts` (requires coupleSecret for auth)
-- Frontend: Add edit button to gallery header (couple view only), open dialog with pre-filled form
+**What was built**:
+- Backend: `updateEvent` helper in `convex/model/events.ts` + `update` mutation in `convex/events.ts`
+- Frontend: `EventEditDialog` in `src/features/events/components/event-edit-dialog.tsx` (TanStack Form + Zod + Calendar + sonner toasts)
+- Pencil icon button in gallery header (couple view only) opens the edit dialog
 
-**What exists**: `EventCreateForm` in `src/features/events/components/event-create-form.tsx` uses TanStack Form + Zod. Can reuse validation schema. Couple auth via `useCoupleSession` hook is already built.
-
-**Acceptance criteria**:
+**Acceptance criteria** (all met):
 - Couple can edit event name and date from the gallery page
-- Requires valid coupleSecret
+- Requires valid coupleSecret (verified in model layer)
 - Changes reflect immediately (Convex reactivity)
 - Slug and secret cannot be changed after creation
 
