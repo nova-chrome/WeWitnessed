@@ -77,7 +77,27 @@ flowchart TD
 
 > **Note:** Offline queue is designed ([ADR 002](decisions/002-offline-queue.md)) but not yet implemented. Currently uploads fail silently if offline.
 
-## 5. Browse Gallery
+## 5. Upload from Photo Library
+
+```mermaid
+flowchart TD
+    A["Guest on /e/{slug}"] --> B[Taps upload FAB]
+    B --> C[Native file picker opens]
+    C --> D[Selects one or more photos]
+    D --> E{First upload?}
+    E -->|Yes| F[GuestNameDialog appears]
+    F --> G{Enter name?}
+    G -->|Yes| H[api.guests.create with deviceId]
+    G -->|Skip| I[Upload without guestId]
+    H --> J[Sequential upload loop]
+    I --> J
+    E -->|No| J
+    J --> K[generateUploadUrl + POST per file]
+    K --> L[api.photos.create per file]
+    L --> M[Toast success / error count]
+```
+
+## 6. Browse Gallery
 
 ```mermaid
 flowchart TD
@@ -97,7 +117,7 @@ flowchart TD
     J --> J5[Photo counter]
 ```
 
-## 6. Couple Manages Photos
+## 7. Couple Manages Photos
 
 ```mermaid
 flowchart TD
@@ -118,7 +138,7 @@ flowchart TD
     H --> M[Delete any photo]
 ```
 
-## 7. Guest Deletes Own Photo
+## 8. Guest Deletes Own Photo
 
 ```mermaid
 flowchart TD
@@ -155,7 +175,9 @@ stateDiagram-v2
     [*] --> Anonymous: First visit (deviceId generated)
     Anonymous --> Gallery: View public photos
     Gallery --> Camera: Tap camera FAB
+    Gallery --> Uploading: Tap upload FAB
     Camera --> Capturing: Tap shutter
+    Uploading --> NamePrompt: First upload
     Capturing --> NamePrompt: First upload
     NamePrompt --> Named: Enter name
     NamePrompt --> Anonymous: Skip
@@ -172,6 +194,7 @@ stateDiagram-v2
 | Create event | Done | Anyone | Visit home, fill form | Event exists, QR + links ready |
 | Join event | Done | Guest | Scan QR / visit link | Gallery visible, camera accessible |
 | Capture photo | Done | Guest | Tap capture on camera screen | Photo uploaded to gallery |
+| Upload from library | Done | Guest | Tap upload FAB on gallery | Photos uploaded from device gallery |
 | Guest name | Done | Guest | First upload triggers dialog | Guest record created (or skipped) |
 | Browse gallery | Done | All | Visit event page | Grid/list view with lightbox |
 | Couple auth | Done | Couple | Visit with `?s=` param | All photos visible, management controls |

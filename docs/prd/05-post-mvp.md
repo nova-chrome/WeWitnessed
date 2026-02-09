@@ -118,18 +118,21 @@ Small improvements to tighten the existing MVP before adding new features.
 
 Features that improve the core photo capture and viewing loop.
 
-### 2.1 Upload from Photo Library
+### 2.1 Upload from Photo Library ✅
 
-**What**: Let guests pick existing photos from their phone instead of only using the live camera.
+**Status**: Complete
 
-**Where to build**:
-- Add an "Upload" button alongside the camera FAB on the gallery page, or as an option on the camera screen
-- Use `<input type="file" accept="image/*" multiple>` for native picker
-- Reuse `usePhotoUpload` hook from `src/features/photos/hooks/use-photo-upload.ts`
+**What was built**:
 
-**What exists**: Upload flow (generateUploadUrl → POST → createPhoto) is built. Guest session management is built.
+- Refactored `GuestNameDialog` (`src/features/guests/components/guest-name-dialog.tsx`) to decouple from blob/upload — replaced `blob` + `uploadPhoto` props with generic `onComplete(guestId)` callback
+- Added secondary upload FAB (smaller, above camera FAB) on gallery page using `ImageIcon`
+- Hidden `<input type="file" accept="image/*" multiple>` triggers native photo picker on tap
+- Sequential multi-file upload with per-file error handling and success/failure toasts
+- Guest name prompt triggers on first upload if no guestId exists (reuses `GuestNameDialog`)
+- Updated empty state hint text to mention both camera and upload options
+- Adapted `EventCameraView` to use new `GuestNameDialog` interface (no behavioral change)
 
-**Acceptance criteria**:
+**Acceptance criteria** (all met):
 - Guest can pick one or more photos from their device gallery
 - Photos upload using the same flow as camera captures
 - Guest name prompt still triggers on first upload if not registered
