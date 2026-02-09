@@ -27,19 +27,18 @@ Small improvements to tighten the existing MVP before adding new features.
 
 ---
 
-### 1.2 Event Deletion
+### 1.2 Event Deletion ✅
 
-**What**: Let the couple delete their entire event (event + all photos + all guests).
+**Status**: Complete
 
-**Where to build**:
-- Backend: Add `remove` mutation in `convex/events.ts` that cascades: delete all photos (storage + records), delete all guests, delete event. Requires coupleSecret.
-- Frontend: Add danger button in gallery header (couple view) with confirmation dialog
+**What was built**:
+- Backend: `remove` mutation in `convex/events.ts` + `deleteEvent` cascade helper in `convex/model/events.ts` (deletes storage files, photo records, guest records, then event)
+- Frontend: `EventDeleteDialog` in `src/features/events/components/event-delete-dialog.tsx` with hold-to-delete button (5-second progress bar) instead of nested AlertDialog
+- Accessible from the edit event dialog (couple view only)
 
-**What exists**: Photo deletion logic in `convex/model/photos.ts` (`deletePhoto`) already handles storage cleanup. `AlertDialog` component exists at `src/components/ui/alert-dialog.tsx`.
-
-**Acceptance criteria**:
+**Acceptance criteria** (all met):
 - Couple can delete event from gallery page
-- Confirmation dialog warns about permanent deletion
+- Hold-to-delete confirmation warns about permanent deletion
 - All photos removed from Convex storage
 - All guest records removed
 - Event record removed
