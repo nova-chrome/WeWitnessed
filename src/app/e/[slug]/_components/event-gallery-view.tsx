@@ -9,6 +9,7 @@ import {
   Share2Icon,
 } from "lucide-react";
 import Image from "next/image";
+import { Skeleton } from "~/components/ui/skeleton";
 import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "~/components/theme-toggle";
@@ -65,13 +66,24 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
       <div className="relative min-h-svh bg-background overflow-hidden">
         <div className="absolute inset-0 bg-gradient-radial from-muted via-background to-background pointer-events-none" />
 
-        <div className="relative flex flex-col items-center justify-center min-h-svh px-6">
-          <div className="animate-spin text-4xl text-muted-foreground">
-            &#9670;
+        {/* Header skeleton */}
+        <div className="relative pt-safe-or-4 px-4 pb-4">
+          <div className="flex flex-col items-center gap-1 pt-4">
+            <div className="text-3xl font-light text-foreground tracking-tight">
+              W
+            </div>
+            <Skeleton className="h-5 w-36 rounded-full" />
+            <Skeleton className="h-3 w-16 rounded-full" />
           </div>
-          <p className="text-muted-foreground text-center text-sm mt-4">
-            Loading...
-          </p>
+        </div>
+
+        {/* Gallery skeleton */}
+        <div className="relative px-2 pb-24">
+          <div className="grid grid-cols-3 gap-0.5">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <Skeleton key={i} className="aspect-square w-full rounded-none" />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -152,7 +164,13 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
 
       {/* Gallery content */}
       <div className="relative px-2 pb-24">
-        {!hasPhotos ? (
+        {photos === undefined ? (
+          <div className="grid grid-cols-3 gap-0.5">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <Skeleton key={i} className="aspect-square w-full rounded-none" />
+            ))}
+          </div>
+        ) : !hasPhotos ? (
           <div className="flex flex-col items-center justify-center py-24 px-6">
             <div className="flex items-center justify-center size-16 rounded-full bg-muted mb-6 animate-in fade-in zoom-in-75 duration-500">
               <HeartIcon className="size-7 text-muted-foreground" />
