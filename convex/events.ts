@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import * as Events from "./model/events";
+import * as Photos from "./model/photos";
 
 export const create = mutation({
   args: {
@@ -64,6 +65,35 @@ export const remove = mutation({
   handler: async (ctx, { eventId, coupleSecret }) => {
     await Events.deleteEvent(ctx, eventId, coupleSecret);
     return null;
+  },
+});
+
+export const getOgData = query({
+  args: { slug: v.string() },
+  returns: v.union(
+    v.null(),
+    v.object({
+      name: v.string(),
+      date: v.optional(v.number()),
+      photoCount: v.number(),
+      coverPhotoUrl: v.union(v.string(), v.null()),
+    }),
+  ),
+  handler: async (ctx, { slug }) => {
+    const event = await Events.getEventBySlug(ctx, slug);
+    if (!event) return null;
+
+    const [photoCount, coverPhotoUrl] = await Promise.all([
+      Photos.getPublicPhotoCount(ctx, event._id),
+      Photos.getLatestPublicPhotoUrl(ctx, event._id),
+    ]);
+
+    return {
+      name: event.name,
+      date: event.date,
+      photoCount,
+      coverPhotoUrl,
+    };
   },
 });
 

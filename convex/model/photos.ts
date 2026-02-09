@@ -74,6 +74,34 @@ export async function deletePhoto(
   await ctx.db.delete(photoId);
 }
 
+export async function getPublicPhotoCount(
+  ctx: QueryCtx,
+  eventId: Id<"events">,
+): Promise<number> {
+  const photos = await ctx.db
+    .query("photos")
+    .withIndex("by_event_public", (q) =>
+      q.eq("eventId", eventId).eq("isPublic", true),
+    )
+    .collect();
+  return photos.length;
+}
+
+export async function getLatestPublicPhotoUrl(
+  ctx: QueryCtx,
+  eventId: Id<"events">,
+): Promise<string | null> {
+  const photo = await ctx.db
+    .query("photos")
+    .withIndex("by_event_public", (q) =>
+      q.eq("eventId", eventId).eq("isPublic", true),
+    )
+    .order("desc")
+    .first();
+  if (!photo) return null;
+  return ctx.storage.getUrl(photo.storageId);
+}
+
 export async function togglePhotoVisibility(
   ctx: MutationCtx,
   photoId: Id<"photos">,
