@@ -80,15 +80,17 @@ Small improvements to tighten the existing MVP before adding new features.
 
 ---
 
-### 1.5 Loading Skeleton for Gallery
+### 1.5 Loading Skeleton for Gallery ✅
 
-**What**: Replace spinner with skeleton grid while photos load.
+**Status**: Complete
 
-**Where to build**: `src/app/e/[slug]/_components/event-gallery-view.tsx`
+**What was built**:
+- Installed shadcn/ui Skeleton component (`src/components/ui/skeleton.tsx`) with `bg-muted` pulse
+- Replaced diamond spinner with full-page skeleton for event loading — "W" logo + header pills + 3×3 photo grid
+- Added separate gallery skeleton for photos loading (event loaded, photos still pending)
+- Both skeletons use identical `grid grid-cols-3 gap-0.5` layout to prevent layout shift
 
-**What exists**: Convex queries return `undefined` while loading. shadcn/ui doesn't have a skeleton component installed yet.
-
-**Acceptance criteria**:
+**Acceptance criteria** (all met):
 - Gallery shows placeholder grid (gray rectangles) while `api.photos.getByEvent` loads
 - Smooth transition from skeleton to real photos
 - No layout shift when photos appear
