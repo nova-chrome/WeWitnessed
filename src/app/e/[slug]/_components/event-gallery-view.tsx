@@ -327,6 +327,7 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
           coupleSecret={couple.coupleSecret}
           name={event.name}
           date={event.date}
+          coverPhotoUrl={event.coverPhotoUrl}
         />
       )}
     </div>

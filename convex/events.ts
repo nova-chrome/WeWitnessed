@@ -68,6 +68,31 @@ export const remove = mutation({
   },
 });
 
+export const setCoverPhoto = mutation({
+  args: {
+    eventId: v.id("events"),
+    coupleSecret: v.string(),
+    storageId: v.id("_storage"),
+  },
+  returns: v.null(),
+  handler: async (ctx, { eventId, coupleSecret, storageId }) => {
+    await Events.setCoverPhoto(ctx, eventId, coupleSecret, storageId);
+    return null;
+  },
+});
+
+export const removeCoverPhoto = mutation({
+  args: {
+    eventId: v.id("events"),
+    coupleSecret: v.string(),
+  },
+  returns: v.null(),
+  handler: async (ctx, { eventId, coupleSecret }) => {
+    await Events.removeCoverPhoto(ctx, eventId, coupleSecret);
+    return null;
+  },
+});
+
 export const getOgData = query({
   args: { slug: v.string() },
   returns: v.union(
@@ -83,10 +108,14 @@ export const getOgData = query({
     const event = await Events.getEventBySlug(ctx, slug);
     if (!event) return null;
 
-    const [photoCount, coverPhotoUrl] = await Promise.all([
+    const [photoCount, fallbackPhotoUrl] = await Promise.all([
       Photos.getPublicPhotoCount(ctx, event._id),
       Photos.getLatestPublicPhotoUrl(ctx, event._id),
     ]);
+
+    const coverPhotoUrl = event.coverPhotoStorageId
+      ? await ctx.storage.getUrl(event.coverPhotoStorageId)
+      : fallbackPhotoUrl;
 
     return {
       name: event.name,
@@ -107,13 +136,17 @@ export const getBySlug = query({
       name: v.string(),
       slug: v.string(),
       date: v.optional(v.number()),
+      coverPhotoUrl: v.union(v.string(), v.null()),
       createdAt: v.number(),
     }),
   ),
   handler: async (ctx, { slug }) => {
     const event = await Events.getEventBySlug(ctx, slug);
     if (!event) return null;
-    const { coupleSecret: _, ...publicEvent } = event;
-    return publicEvent;
+    const { coupleSecret: _, coverPhotoStorageId, ...publicEvent } = event;
+    const coverPhotoUrl = coverPhotoStorageId
+      ? await ctx.storage.getUrl(coverPhotoStorageId)
+      : null;
+    return { ...publicEvent, coverPhotoUrl };
   },
 });

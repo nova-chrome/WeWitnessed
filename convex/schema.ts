@@ -7,6 +7,7 @@ export default defineSchema({
     slug: v.string(),
     date: v.optional(v.number()),
     coupleSecret: v.string(),
+    coverPhotoStorageId: v.optional(v.id("_storage")),
     createdAt: v.number(),
   }).index("by_slug", ["slug"]),
 

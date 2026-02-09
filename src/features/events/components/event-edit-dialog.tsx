@@ -3,7 +3,14 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "convex/react";
 import { format, startOfDay } from "date-fns";
-import { CalendarIcon, Loader2Icon } from "lucide-react";
+import {
+  CalendarIcon,
+  ImagePlusIcon,
+  Loader2Icon,
+  Trash2Icon,
+} from "lucide-react";
+import Image from "next/image";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { tryCatch } from "~/utils/try-catch";
@@ -41,6 +48,7 @@ interface EventEditDialogProps {
   coupleSecret: string;
   name: string;
   date?: number;
+  coverPhotoUrl: string | null;
 }
 
 export function EventEditDialog({
@@ -50,8 +58,55 @@ export function EventEditDialog({
   coupleSecret,
   name,
   date,
+  coverPhotoUrl,
 }: EventEditDialogProps) {
   const updateEvent = useMutation(api.events.update);
+  const generateUploadUrl = useMutation(api.photos.generateUploadUrl);
+  const setCoverPhoto = useMutation(api.events.setCoverPhoto);
+  const removeCoverPhotoMutation = useMutation(api.events.removeCoverPhoto);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [isRemovingCover, setIsRemovingCover] = useState(false);
+
+  async function handleCoverUpload(file: File) {
+    setIsUploadingCover(true);
+    const { error } = await tryCatch(
+      (async () => {
+        const uploadUrl = await generateUploadUrl();
+        const response = await fetch(uploadUrl, {
+          method: "POST",
+          headers: { "Content-Type": file.type },
+          body: file,
+        });
+        if (!response.ok) throw new Error("Upload failed");
+        const { storageId } = (await response.json()) as {
+          storageId: Id<"_storage">;
+        };
+        await setCoverPhoto({ eventId, coupleSecret, storageId });
+      })(),
+    );
+    setIsUploadingCover(false);
+
+    if (error) {
+      toast.error("Failed to upload cover photo");
+      return;
+    }
+    toast.success("Cover photo updated");
+  }
+
+  async function handleCoverRemove() {
+    setIsRemovingCover(true);
+    const { error } = await tryCatch(
+      removeCoverPhotoMutation({ eventId, coupleSecret }),
+    );
+    setIsRemovingCover(false);
+
+    if (error) {
+      toast.error("Failed to remove cover photo");
+      return;
+    }
+    toast.success("Cover photo removed");
+  }
 
   const form = useForm({
     defaultValues: {
@@ -187,6 +242,89 @@ export function EventEditDialog({
             )}
           </form.Subscribe>
         </form>
+
+        <Separator className="my-2" />
+
+        <div className="space-y-3">
+          <p className="text-muted-foreground text-xs tracking-wider uppercase">
+            Share Preview Photo
+          </p>
+          <p className="text-muted-foreground/60 text-xs">
+            This photo appears when you share the event link on iMessage,
+            WhatsApp, or social media.
+          </p>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleCoverUpload(file);
+              e.target.value = "";
+            }}
+          />
+
+          {coverPhotoUrl ? (
+            <div className="relative rounded-md overflow-hidden aspect-[1200/630] bg-muted">
+              <Image
+                src={coverPhotoUrl}
+                alt="Cover photo preview"
+                fill
+                sizes="280px"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-colors group flex items-center justify-center gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  disabled={isUploadingCover}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {isUploadingCover ? (
+                    <Loader2Icon className="size-3.5 animate-spin" />
+                  ) : (
+                    <ImagePlusIcon className="size-3.5" />
+                  )}
+                  Replace
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  disabled={isRemovingCover}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={handleCoverRemove}
+                >
+                  {isRemovingCover ? (
+                    <Loader2Icon className="size-3.5 animate-spin" />
+                  ) : (
+                    <Trash2Icon className="size-3.5" />
+                  )}
+                  Remove
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isUploadingCover}
+              className="w-full h-20 border-dashed border-border bg-card hover:bg-primary/10 hover:text-primary"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {isUploadingCover ? (
+                <Loader2Icon className="size-4 animate-spin" />
+              ) : (
+                <ImagePlusIcon className="size-4" />
+              )}
+              Upload cover photo
+            </Button>
+          )}
+        </div>
 
         <Separator className="my-2" />
 
