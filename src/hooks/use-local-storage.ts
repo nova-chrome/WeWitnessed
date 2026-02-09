@@ -65,7 +65,7 @@ export function useLocalStorage<T>(
         console.warn(e);
       }
     },
-    [key, store],
+    [key, store, initialValue],
   );
 
   useEffect(() => {

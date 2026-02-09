@@ -143,7 +143,7 @@ export const getBySlug = query({
   handler: async (ctx, { slug }) => {
     const event = await Events.getEventBySlug(ctx, slug);
     if (!event) return null;
-    const { coupleSecret: _, coverPhotoStorageId, ...publicEvent } = event;
+    const { coverPhotoStorageId, ...publicEvent } = event;
     const coverPhotoUrl = coverPhotoStorageId
       ? await ctx.storage.getUrl(coverPhotoStorageId)
       : null;
