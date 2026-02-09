@@ -23,9 +23,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
+import { Separator } from "~/components/ui/separator";
 import { api } from "~/convex/_generated/api";
 import type { Id } from "~/convex/_generated/dataModel";
 import { cn } from "~/lib/utils";
+import { EventDeleteDialog } from "./event-delete-dialog";
 
 const EventEditFormSchema = z.object({
   name: z.string().trim().min(1, "Event name is required"),
@@ -185,6 +187,15 @@ export function EventEditDialog({
             )}
           </form.Subscribe>
         </form>
+
+        <Separator className="my-2" />
+
+        <div className="space-y-2">
+          <p className="text-muted-foreground text-xs tracking-wider uppercase">
+            Danger Zone
+          </p>
+          <EventDeleteDialog eventId={eventId} coupleSecret={coupleSecret} />
+        </div>
       </DialogContent>
     </Dialog>
   );

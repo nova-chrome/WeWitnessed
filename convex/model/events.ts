@@ -133,3 +133,41 @@ export async function updateEvent(
 
   await ctx.db.patch(eventId, patch);
 }
+
+export async function deleteEvent(
+  ctx: MutationCtx,
+  eventId: Id<"events">,
+  coupleSecret: string,
+): Promise<void> {
+  const isValid = await verifyCoupleSecret(ctx, eventId, coupleSecret);
+  if (!isValid) {
+    throw new ConvexError({
+      code: "Forbidden",
+      message: "Invalid couple secret",
+    });
+  }
+
+  // Delete all photos (storage files + DB records)
+  const photos = await ctx.db
+    .query("photos")
+    .withIndex("by_event", (q) => q.eq("eventId", eventId))
+    .collect();
+
+  await Promise.all(
+    photos.map(async (photo) => {
+      await ctx.storage.delete(photo.storageId);
+      await ctx.db.delete(photo._id);
+    }),
+  );
+
+  // Delete all guests
+  const guests = await ctx.db
+    .query("guests")
+    .withIndex("by_event", (q) => q.eq("eventId", eventId))
+    .collect();
+
+  await Promise.all(guests.map((guest) => ctx.db.delete(guest._id)));
+
+  // Delete the event itself
+  await ctx.db.delete(eventId);
+}
