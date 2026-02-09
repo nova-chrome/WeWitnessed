@@ -92,9 +92,12 @@ export function EventCameraView({ slug }: EventCameraViewProps) {
 
       <GuestNameDialog
         open={showNamePrompt}
-        blob={pendingBlob}
         createGuest={createGuest}
-        uploadPhoto={uploadPhoto}
+        onComplete={async (resolvedGuestId) => {
+          setShowNamePrompt(false);
+          if (pendingBlob) await uploadPhoto(pendingBlob, resolvedGuestId);
+          setPendingBlob(null);
+        }}
         onClose={handleNameDialogClose}
       />
     </div>

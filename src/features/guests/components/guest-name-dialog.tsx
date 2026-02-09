@@ -17,24 +17,22 @@ import { tryCatch } from "~/utils/try-catch";
 
 interface GuestNameDialogProps {
   open: boolean;
-  blob: Blob | null;
   createGuest: (name: string) => Promise<string>;
-  uploadPhoto: (blob: Blob, guestId: string | null) => Promise<void>;
+  onComplete: (guestId: string | null) => Promise<void>;
   onClose: () => void;
 }
 
 export function GuestNameDialog({
   open,
-  blob,
   createGuest,
-  uploadPhoto,
+  onComplete,
   onClose,
 }: GuestNameDialogProps) {
   const [name, setName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = useCallback(async () => {
-    if (!name.trim() || !blob) return;
+    if (!name.trim()) return;
 
     setIsSubmitting(true);
     const { data: guestId, error } = await tryCatch(
@@ -47,16 +45,12 @@ export function GuestNameDialog({
       return;
     }
 
-    onClose();
-    await uploadPhoto(blob, guestId);
-  }, [name, blob, createGuest, uploadPhoto, onClose]);
+    await onComplete(guestId);
+  }, [name, createGuest, onComplete]);
 
   const handleSkip = useCallback(async () => {
-    if (!blob) return;
-
-    onClose();
-    await uploadPhoto(blob, null);
-  }, [blob, uploadPhoto, onClose]);
+    await onComplete(null);
+  }, [onComplete]);
 
   return (
     <Dialog open={open} onOpenChange={() => onClose()}>

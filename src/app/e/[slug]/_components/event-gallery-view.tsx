@@ -4,6 +4,7 @@ import { useQuery } from "convex/react";
 import {
   CameraIcon,
   HeartIcon,
+  ImageIcon,
   KeyRoundIcon,
   PencilIcon,
   Share2Icon,
@@ -11,16 +12,20 @@ import {
 import Image from "next/image";
 import { Skeleton } from "~/components/ui/skeleton";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { toast } from "sonner";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { api } from "~/convex/_generated/api";
 import { EventEditDrawer } from "~/features/events/components/event-edit-drawer";
 import { EventShareDialog } from "~/features/events/components/event-share-dialog";
 import { useCoupleSession } from "~/features/events/hooks/use-couple-session";
+import { GuestNameDialog } from "~/features/guests/components/guest-name-dialog";
 import { useGuestSession } from "~/features/guests/hooks/use-guest-session";
 import { PhotoLightbox } from "~/features/photos/components/photo-lightbox";
+import { usePhotoUpload } from "~/features/photos/hooks/use-photo-upload";
 import { VisibilityToggle } from "~/features/photos/components/visibility-toggle";
 import { cn } from "~/lib/utils";
+import { tryCatch } from "~/utils/try-catch";
 import type { ViewMode } from "~/features/gallery/components/view-toggle";
 import { ViewToggle } from "~/features/gallery/components/view-toggle";
 
@@ -43,11 +48,16 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
       : "skip",
   );
 
+  const { upload, isUploading } = usePhotoUpload();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
     null,
   );
   const [editOpen, setEditOpen] = useState(false);
+  const [showNamePrompt, setShowNamePrompt] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
   function handlePhotoClick(index: number) {
     setSelectedPhotoIndex(index);
@@ -60,6 +70,54 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
   function toggleViewMode() {
     setViewMode((prev) => (prev === "grid" ? "list" : "grid"));
   }
+
+  const uploadFiles = useCallback(
+    async (files: File[], guestId: string | null) => {
+      if (!event) return;
+
+      let failed = 0;
+      for (const file of files) {
+        const { error } = await tryCatch(
+          upload(
+            event._id,
+            guestId as Parameters<typeof upload>[1],
+            file,
+          ),
+        );
+        if (error) failed++;
+      }
+
+      if (failed > 0) {
+        toast.error(`${failed} ${failed === 1 ? "photo" : "photos"} failed to upload.`);
+      }
+      const succeeded = files.length - failed;
+      if (succeeded > 0) {
+        toast.success(
+          succeeded === 1
+            ? "Photo uploaded!"
+            : `${succeeded} photos uploaded!`,
+        );
+      }
+    },
+    [event, upload],
+  );
+
+  const handleFilesSelected = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = Array.from(e.target.files ?? []);
+      e.target.value = "";
+      if (files.length === 0) return;
+
+      if (!guest.guestId) {
+        setPendingFiles(files);
+        setShowNamePrompt(true);
+        return;
+      }
+
+      uploadFiles(files, guest.guestId);
+    },
+    [guest.guestId, uploadFiles],
+  );
 
   if (event === undefined) {
     return (
@@ -200,7 +258,8 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
                   Every love story deserves great photos
                 </p>
                 <p className="text-muted-foreground/60 text-center text-xs tracking-wide max-w-[220px] mb-8">
-                  Tap the camera below to capture the first moment
+                  Tap the camera below to capture a moment, or upload photos
+                  from your library
                 </p>
                 <div className="animate-bounce-subtle text-purple-500/60">
                   <svg
@@ -325,16 +384,52 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
         />
       )}
 
-      {/* Camera FAB — hidden when lightbox is open */}
+      {/* Hidden file input for photo library upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={handleFilesSelected}
+      />
+
+      {/* FABs — hidden when lightbox is open */}
       {selectedPhotoIndex === null && (
-        <Link
-          href={`/e/${slug}/camera`}
-          className="fixed bottom-6 right-6 z-10 flex items-center justify-center size-14 rounded-full bg-linear-to-br from-purple-500 to-purple-600 shadow-lg shadow-purple-500/25 transition-transform active:scale-95"
-          aria-label="Take a photo"
-        >
-          <CameraIcon className="size-6 text-white" />
-        </Link>
+        <div className="fixed bottom-6 right-6 z-10 flex flex-col items-center gap-3">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+            className="flex items-center justify-center size-11 rounded-full bg-background/80 backdrop-blur border border-border shadow-lg transition-transform active:scale-95 disabled:opacity-50"
+            aria-label="Upload from photo library"
+          >
+            <ImageIcon className="size-5 text-foreground" />
+          </button>
+          <Link
+            href={`/e/${slug}/camera`}
+            className="flex items-center justify-center size-14 rounded-full bg-linear-to-br from-purple-500 to-purple-600 shadow-lg shadow-purple-500/25 transition-transform active:scale-95"
+            aria-label="Take a photo"
+          >
+            <CameraIcon className="size-6 text-white" />
+          </Link>
+        </div>
       )}
+
+      {/* Guest name prompt for photo library uploads */}
+      <GuestNameDialog
+        open={showNamePrompt}
+        createGuest={guest.createGuest}
+        onComplete={async (resolvedGuestId) => {
+          setShowNamePrompt(false);
+          await uploadFiles(pendingFiles, resolvedGuestId);
+          setPendingFiles([]);
+        }}
+        onClose={() => {
+          setShowNamePrompt(false);
+          setPendingFiles([]);
+        }}
+      />
 
       {/* Edit Event Drawer (couple only) */}
       {couple.isCouple && couple.coupleSecret && (
