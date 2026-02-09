@@ -23,3 +23,7 @@ jobs:
       - run: npx tsc --noEmit
       - run: npx tsc --noEmit -p convex/tsconfig.json
       - run: npm run build
+        env:
+          CONVEX_DEPLOYMENT: ci-placeholder
+          NEXT_PUBLIC_CONVEX_URL: https://ci-placeholder.convex.cloud
+          NEXT_PUBLIC_CONVEX_SITE_URL: https://ci-placeholder.convex.site
