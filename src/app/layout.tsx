@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
 import { PropsWithChildren } from "react";
-import { ConvexProvider } from "~/components/convex-provider";
-import { PWARegister } from "~/components/pwa-register";
-import { ThemeProvider } from "~/components/theme-provider";
-import { Toaster } from "~/components/ui/sonner";
+import { Providers } from "~/components/providers";
 import { cn } from "~/lib/utils";
 import "./globals.css";
 
@@ -33,11 +30,7 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
         className={cn(geistSans.variable, geistMono.variable, "antialiased")}
         vaul-drawer-wrapper=""
       >
-        <ThemeProvider>
-          <ConvexProvider>{children}</ConvexProvider>
-          <Toaster />
-        </ThemeProvider>
-        <PWARegister />
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
