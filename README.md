@@ -22,6 +22,7 @@ WeWitnessed lets wedding guests upload photos from their phones to a shared gall
 | PWA (installable) | Done |
 | Dark/light/system theme | Done |
 | Gallery empty state (role-aware) | Done |
+| Dynamic Open Graph images | Done |
 | Offline queue | Designed, not built |
 
 ## 🛠️ Tech Stack

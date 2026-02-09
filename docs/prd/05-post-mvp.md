@@ -64,18 +64,18 @@ Small improvements to tighten the existing MVP before adding new features.
 
 ---
 
-### 1.4 Dynamic Open Graph Meta
+### 1.4 Dynamic Open Graph Meta ✅
 
-**What**: Generate dynamic OG images for event pages so links look good when shared on iMessage, WhatsApp, social media.
+**Status**: Complete
 
-**Where to build**:
-- Add `generateMetadata` to `src/app/e/[slug]/page.tsx` (already a server component)
-- Optionally add `src/app/e/[slug]/opengraph-image.tsx` for dynamic OG image generation
+**What was built**:
+- Backend: `getOgData` query in `convex/events.ts` returning event name, date, photo count, and latest public photo URL. Supporting helpers `getPublicPhotoCount` and `getLatestPublicPhotoUrl` in `convex/model/photos.ts`
+- Frontend: `generateMetadata` in `src/app/e/[slug]/page.tsx` using `fetchQuery` from `convex/nextjs` for dynamic title, description, OpenGraph, and Twitter card meta tags
+- Frontend: `src/app/e/[slug]/opengraph-image.tsx` generating a 1200×630 PNG with latest event photo as background, dark gradient overlay, event name, photo count, date, and WeWitnessed branding
 
-**What exists**: Root layout has static metadata. `page.tsx` receives `params.slug` and fetches event via Convex.
-
-**Acceptance criteria**:
+**Acceptance criteria** (all met):
 - Sharing `/e/{slug}` on iMessage/WhatsApp shows: event name, photo count, "WeWitnessed" branding
+- Latest public photo used as OG image background (gradient fallback when no photos)
 - Falls back gracefully if event not found
 
 ---
