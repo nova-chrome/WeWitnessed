@@ -4,52 +4,45 @@
 
 Mid-May 2025 (cousin's wedding)
 
-## In Scope
+## Must Have
 
-### Must Have
+| Feature | Description | Status |
+|---------|-------------|--------|
+| Event creation | Couple creates event with name, optional date, custom slug, custom secret. Gets QR code + shareable links | Done |
+| Guest upload | Full-screen camera capture (front/back, zoom, flash) → upload to Convex storage | Done |
+| Gallery view | Grid/list toggle, photo lightbox with navigation, download, delete | Done |
+| Public/private toggle | Per-photo visibility control (couple only), dimmed UI for private photos | Done |
+| Couple auth | URL-based secret (`?s=`), verified against Convex, persisted in localStorage | Done |
+| Guest identity | Device ID tracking, optional name prompt on first upload, returning guest detection | Done |
+| Photo deletion | Couple can delete any photo, guests can delete their own. Confirmation dialog | Done |
+| PWA | Installable via manifest + service worker shell | Done |
+| Theme | Dark/light/system toggle via next-themes | Done |
 
-| Feature | Description |
-|---------|-------------|
-| Event creation | Couple creates event, gets shareable link/QR |
-| Guest upload | Camera capture → upload to event |
-| Gallery view | View all photos for an event |
-| Public/private toggle | Per-photo visibility control |
-| Offline queue | Store locally, sync when online |
+## Nice to Have (from original plan)
 
-### Nice to Have
+| Feature | Description | Status |
+|---------|-------------|--------|
+| Guest name | Optional "who took this?" field | Done |
+| Download all | Couple can download zip of photos | Not built |
+| Offline queue | Store locally in IndexedDB, sync when online | Not built (ADR accepted, not implemented) |
 
-| Feature | Description |
-|---------|-------------|
-| Guest name | Optional "who took this?" field |
-| Download all | Couple can download zip of photos |
-
-## Out of Scope
+## Out of Scope (deferred to post-MVP)
 
 - Video capture/upload
-- User accounts for guests
+- User accounts (couple or guest)
 - AI features (tagging, storytelling)
-- Photo editing
-- Comments/reactions
+- Photo editing / filters
+- Comments / reactions
 - Multiple events per couple
-- Payment/monetization
+- Payment / monetization
+- Event editing after creation
+- Event deletion
 
-## Current Progress
+## Build Order (completed)
 
-| Component | Status |
-|-----------|--------|
-| Camera capture UI | Done |
-| PWA setup | Done |
-| Convex schema | Not started |
-| Upload flow | Not started |
-| Event creation | Not started |
-| Gallery view | Not started |
-| Offline queue | Not started |
-
-## Build Order
-
-1. Schema + file upload
-2. Event creation
-3. Guest flow (QR → camera → upload)
-4. Gallery view
-5. Public/private toggle
-6. Offline queue (most complex, save for last)
+1. ~~Schema + file upload~~ — Done
+2. ~~Event creation~~ — Done
+3. ~~Guest flow (QR → camera → upload)~~ — Done
+4. ~~Gallery view~~ — Done
+5. ~~Public/private toggle~~ — Done
+6. Offline queue — Deferred (see [ADR 002](../decisions/002-offline-queue.md))

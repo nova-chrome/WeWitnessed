@@ -10,13 +10,18 @@ WeWitnessed lets wedding guests upload photos from their phones to a shared gall
 
 | Feature | Status |
 |---------|--------|
-| Camera capture UI | ✅ Done |
-| PWA (installable) | ✅ Done |
-| Event creation | 🔜 Planned |
-| Guest upload | 🔜 Planned |
-| Gallery view | 🔜 Planned |
-| Public/private toggle | 🔜 Planned |
-| Offline queue | 🔜 Planned |
+| Event creation (name, date, custom slug, secret) | Done |
+| QR code + share dialog | Done |
+| Camera capture (front/back, zoom, flash) | Done |
+| Guest identity (device tracking, name prompt) | Done |
+| Photo upload to Convex storage | Done |
+| Gallery view (grid/list, lightbox, download) | Done |
+| Couple auth via URL secret | Done |
+| Per-photo visibility toggle (couple) | Done |
+| Photo deletion (couple + guest own) | Done |
+| PWA (installable) | Done |
+| Dark/light/system theme | Done |
+| Offline queue | Designed, not built |
 
 ## 🛠️ Tech Stack
 
@@ -71,12 +76,14 @@ wewitnessed/
 ├── src/
 │   ├── app/           # Next.js App Router pages
 │   ├── components/    # Shared UI components
-│   ├── features/      # Feature modules (camera, etc.)
-│   ├── lib/           # Configuration
+│   ├── features/      # Feature modules (camera, events, guests, photos)
+│   ├── hooks/         # Shared hooks
+│   ├── lib/           # Configuration & integrations
 │   └── utils/         # Pure utility functions
-├── convex/            # Convex backend (schema, functions)
+├── convex/            # Convex backend (schema, functions, model/)
 └── docs/
     ├── prd/           # Product requirements
+    ├── decisions/     # Architecture Decision Records
     └── user-flows.md  # User flow diagrams
 ```
 

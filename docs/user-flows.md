@@ -1,162 +1,180 @@
 # User Flows
 
-All user flows for the wedding photo sharing app.
+All user flows for the wedding photo sharing app. Updated to reflect current implementation.
 
 ## 1. Couple Creates Event
 
 ```mermaid
 flowchart TD
-    A[Couple visits app] --> B[Lands on home page]
-    B --> C[Enters event name]
-    C --> D{Add date?}
-    D -->|Yes| E[Picks date]
-    D -->|No| F[Clicks Create]
-    E --> F
-    F --> G[Backend creates event + coupleSecret]
-    G --> H[Shows QR code + shareable link]
-    H --> I[Couple saves secret link]
-    H --> J[Couple shares QR with guests]
+    A[Couple visits /] --> B[Lands on home page]
+    B --> C[Fills EventCreateForm]
+    C --> C1[Event name - required]
+    C --> C2[Date - optional picker]
+    C --> C3[Custom slug - optional]
+    C --> C4[Custom secret - optional]
+    C1 & C2 & C3 & C4 --> F[Submits form]
+    F --> G[api.events.create]
+    G --> H[EventCreateSuccess screen]
+    H --> H1[QR code for guests]
+    H --> H2[Guest link with copy button]
+    H --> H3[Couple link with copy button]
+    H1 & H2 & H3 --> I[Couple saves secret link]
 ```
 
-## 2. Guest First Visit
+## 2. Guest First Visit + Photo Capture
 
 ```mermaid
 flowchart TD
-    A[Guest scans QR] --> B[Lands on event page]
-    B --> C{Has guestId in localStorage?}
-    C -->|No| D[Show name modal]
-    D --> E[Guest enters name]
-    E --> F[Generate deviceId if needed]
-    F --> G[Create guest in Convex]
-    G --> H[Store guestId in localStorage]
-    H --> I[Show camera]
-    C -->|Yes| I
+    A[Guest scans QR] --> B["Lands on /e/{slug}"]
+    B --> C[Sees public photo gallery]
+    C --> D[Taps camera FAB]
+    D --> E["Opens /e/{slug}/camera"]
+    E --> F[Full-screen camera preview]
+    F --> G[Taps capture button]
+    G --> H[JPEG snapshot at 85%]
+    H --> I{First upload?}
+    I -->|Yes| J[GuestNameDialog appears]
+    J --> K{Enter name?}
+    K -->|Yes| L[api.guests.create with deviceId]
+    K -->|Skip| M[Upload without guestId]
+    L --> N[generateUploadUrl + POST blob]
+    M --> N
+    I -->|No| N
+    N --> O[api.photos.create]
+    O --> P[Return to gallery]
 ```
 
-## 3. Guest Returns
+## 3. Returning Guest
 
 ```mermaid
 flowchart TD
-    A[Guest visits event link] --> B[Check localStorage for guestId]
-    B --> C{guestId exists?}
-    C -->|Yes| D[Fetch guest from Convex]
-    D --> E{Guest found?}
-    E -->|Yes| F[Show camera with name]
-    E -->|No| G[Show name modal]
-    C -->|No| G
-    G --> H[Re-register guest]
-    H --> F
+    A[Guest revisits event link] --> B[Read deviceId from localStorage]
+    B --> C[api.guests.getByDevice]
+    C --> D{Guest found?}
+    D -->|Yes| E[Recognized - no name prompt on next upload]
+    D -->|No| F[Treated as new guest]
+    E --> G[Gallery view]
+    F --> G
 ```
 
 ## 4. Photo Capture & Upload
 
 ```mermaid
 flowchart TD
-    A[Guest on camera screen] --> B[Taps capture]
-    B --> C[Photo captured from stream]
-    C --> D{Online?}
-    D -->|Yes| E[Upload to Convex storage]
-    E --> F[Create photo record]
-    F --> G[Show success feedback]
-    D -->|No| H[Save to IndexedDB queue]
-    H --> I[Show queued indicator]
-    I --> J{Connection restored?}
-    J -->|Yes| K[Sync queued photos]
-    K --> E
+    A["Guest on /e/{slug}/camera"] --> B[Camera stream active]
+    B --> B1[Zoom: 0.5x / 1x]
+    B --> B2[Camera flip: front / back]
+    B --> B3[Mirrored preview for front cam]
+    B1 & B2 & B3 --> C[Taps capture]
+    C --> D[Canvas snapshot → JPEG blob]
+    D --> E[Upload overlay shown]
+    E --> F[generateUploadUrl]
+    F --> G[POST blob to upload URL]
+    G --> H[api.photos.create]
+    H --> I[Upload overlay dismissed]
+    I --> J[Toast success / error]
 ```
 
-## 5. View Gallery
+> **Note:** Offline queue is designed ([ADR 002](decisions/002-offline-queue.md)) but not yet implemented. Currently uploads fail silently if offline.
+
+## 5. Browse Gallery
 
 ```mermaid
 flowchart TD
-    A[User taps Gallery] --> B[Load event photos]
-    B --> C{Is couple?}
-    C -->|Yes| D[Fetch all photos]
-    C -->|No| E[Fetch public photos only]
-    D --> F[Show gallery grid]
-    E --> F
-    F --> G[Tap photo]
-    G --> H[Show full photo view]
+    A["User visits /e/{slug}"] --> B[api.events.getBySlug]
+    B --> C{Couple secret in localStorage?}
+    C -->|Yes| D["api.photos.getByEvent(eventId, secret)"]
+    C -->|No| E["api.photos.getByEvent(eventId)"]
+    D --> F[Show ALL photos + Couple View badge]
+    E --> G[Show public photos only]
+    F & G --> H[Grid view / List view toggle]
+    H --> I[Tap photo]
+    I --> J[PhotoLightbox opens]
+    J --> J1[Arrow nav + keyboard]
+    J --> J2[Download button]
+    J --> J3[Delete button - if owner or couple]
+    J --> J4[Visibility toggle - couple only]
+    J --> J5[Photo counter]
 ```
 
-## 6. Toggle Photo Visibility (Couple Only)
+## 6. Couple Manages Photos
 
 ```mermaid
 flowchart TD
-    A[Couple views photo] --> B{Has coupleSecret?}
-    B -->|No| C[No toggle shown]
-    B -->|Yes| D[Show visibility toggle]
-    D --> E[Couple taps toggle]
-    E --> F[Update isPublic in Convex]
-    F --> G{New state?}
-    G -->|Public| H[Guests can see photo]
-    G -->|Private| I[Only couple sees photo]
+    A["Couple visits /e/{slug}?s={secret}"] --> B[useCoupleSession reads param]
+    B --> C[api.events.verifyCoupleSecret]
+    C --> D{Valid?}
+    D -->|Yes| E[Secret stored in localStorage]
+    D -->|No| F[Treated as guest]
+    E --> G[URL param cleaned]
+    G --> H[Couple View active]
+    H --> I[See all photos - private ones dimmed]
+    H --> J[Share button → EventShareDialog]
+    J --> J1[QR code download]
+    J --> J2[Guest link copy]
+    J --> J3[Couple link copy]
+    H --> K[Toggle visibility per photo]
+    H --> L[Delete any photo]
 ```
 
-## 7. Offline Queue Sync
+## 7. Guest Deletes Own Photo
 
 ```mermaid
 flowchart TD
-    A[App loads] --> B[Check IndexedDB queue]
-    B --> C{Pending photos?}
-    C -->|No| D[Done]
-    C -->|Yes| E{Online?}
-    E -->|No| F[Wait for connection]
-    F --> E
-    E -->|Yes| G[Get next queued photo]
-    G --> H[Upload to Convex]
-    H --> I{Success?}
-    I -->|Yes| J[Remove from queue]
-    I -->|No| K[Retry later]
-    J --> L{More in queue?}
-    L -->|Yes| G
-    L -->|No| D
+    A[Guest opens own photo in lightbox] --> B[Delete button visible]
+    B --> C[Taps delete]
+    C --> D[AlertDialog confirmation]
+    D --> E["api.photos.remove(photoId, eventId, deviceId)"]
+    E --> F[Backend validates: photo.guestId matches guest's deviceId]
+    F --> G{Authorized?}
+    G -->|Yes| H[Storage file + DB record deleted]
+    G -->|No| I[Forbidden error]
 ```
 
 ## Page Map
 
 ```mermaid
 flowchart LR
-    subgraph Public
+    subgraph Implemented
         HOME["/ (Home)"]
         EVENT["/e/:slug (Gallery)"]
         CAMERA["/e/:slug/camera"]
     end
 
-    subgraph Couple Only
-        MANAGE["/e/:slug/manage"]
-    end
-
     HOME -->|Create event| EVENT
-    EVENT -->|Scan QR| CAMERA
-    CAMERA -->|View photos| EVENT
-    EVENT -->|Secret link| MANAGE
-    MANAGE -->|Back| EVENT
+    EVENT -->|Camera FAB| CAMERA
+    CAMERA -->|Back button| EVENT
+    EVENT -->|"?s= param"| EVENT
 ```
 
 ## Guest Session States
 
 ```mermaid
 stateDiagram-v2
-    [*] --> NoSession: First visit
-    NoSession --> NamePrompt: Show modal
-    NamePrompt --> Registered: Submit name
-    Registered --> Camera: Ready
+    [*] --> Anonymous: First visit (deviceId generated)
+    Anonymous --> Gallery: View public photos
+    Gallery --> Camera: Tap camera FAB
     Camera --> Capturing: Tap shutter
-    Capturing --> Camera: Done
-    Camera --> Gallery: View photos
-    Gallery --> Camera: Back
+    Capturing --> NamePrompt: First upload
+    NamePrompt --> Named: Enter name
+    NamePrompt --> Anonymous: Skip
+    Named --> Camera: Continue capturing
+    Camera --> Gallery: Back button
 
-    [*] --> Registered: Return visit (localStorage)
+    [*] --> Named: Return visit (deviceId + guestId in localStorage)
 ```
 
 ## Summary
 
-| Flow | Actors | Trigger | End State |
-|------|--------|---------|-----------|
-| Create event | Couple | Visit home, fill form | Event exists, QR ready |
-| Join event | Guest | Scan QR | Guest registered, camera ready |
-| Capture photo | Guest | Tap shutter | Photo in gallery (or queue) |
-| View gallery | All | Tap gallery | See photos |
-| Toggle visibility | Couple | Tap toggle | Photo public/private |
-| Sync queue | System | Connection restored | Queued photos uploaded |
+| Flow | Status | Actors | Trigger | End State |
+|------|--------|--------|---------|-----------|
+| Create event | Done | Anyone | Visit home, fill form | Event exists, QR + links ready |
+| Join event | Done | Guest | Scan QR / visit link | Gallery visible, camera accessible |
+| Capture photo | Done | Guest | Tap capture on camera screen | Photo uploaded to gallery |
+| Guest name | Done | Guest | First upload triggers dialog | Guest record created (or skipped) |
+| Browse gallery | Done | All | Visit event page | Grid/list view with lightbox |
+| Couple auth | Done | Couple | Visit with `?s=` param | All photos visible, management controls |
+| Toggle visibility | Done | Couple | Tap toggle in lightbox | Photo public/private flipped |
+| Delete photo | Done | Couple / Guest (own) | Tap delete in lightbox | Photo removed from storage + DB |
+| Share event | Done | Couple | Tap share button | Dialog with QR, guest link, couple link |
+| Offline queue | Not built | System | — | See [ADR 002](decisions/002-offline-queue.md) |
