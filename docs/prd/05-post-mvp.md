@@ -27,19 +27,18 @@ Small improvements to tighten the existing MVP before adding new features.
 
 ---
 
-### 1.2 Event Deletion
+### 1.2 Event Deletion ✅
 
-**What**: Let the couple delete their entire event (event + all photos + all guests).
+**Status**: Complete
 
-**Where to build**:
-- Backend: Add `remove` mutation in `convex/events.ts` that cascades: delete all photos (storage + records), delete all guests, delete event. Requires coupleSecret.
-- Frontend: Add danger button in gallery header (couple view) with confirmation dialog
+**What was built**:
+- Backend: `remove` mutation in `convex/events.ts` + `deleteEvent` cascade helper in `convex/model/events.ts` (deletes storage files, photo records, guest records, then event)
+- Frontend: `EventDeleteDialog` in `src/features/events/components/event-delete-dialog.tsx` with hold-to-delete button (5-second progress bar) instead of nested AlertDialog
+- Accessible from the edit event dialog (couple view only)
 
-**What exists**: Photo deletion logic in `convex/model/photos.ts` (`deletePhoto`) already handles storage cleanup. `AlertDialog` component exists at `src/components/ui/alert-dialog.tsx`.
-
-**Acceptance criteria**:
+**Acceptance criteria** (all met):
 - Couple can delete event from gallery page
-- Confirmation dialog warns about permanent deletion
+- Hold-to-delete confirmation warns about permanent deletion
 - All photos removed from Convex storage
 - All guest records removed
 - Event record removed
@@ -47,16 +46,19 @@ Small improvements to tighten the existing MVP before adding new features.
 
 ---
 
-### 1.3 Gallery Empty State
+### 1.3 Gallery Empty State ✅
 
-**What**: Improve the empty gallery experience to guide guests.
+**Status**: Complete
 
-**Where to build**: `src/app/e/[slug]/_components/event-gallery-view.tsx` — replace the current "No photos yet" text.
+**What was built**:
+- Role-aware empty state in `src/app/e/[slug]/_components/event-gallery-view.tsx`
+- Guest view: HeartIcon + encouraging message + animated curved arrow pointing to camera FAB
+- Couple view: HeartIcon + message + "Invite guests" button that opens EventShareDialog
+- Extended `EventShareDialog` to accept children for custom trigger rendering
+- Added `bounce-subtle` CSS keyframe animation in `globals.css`
 
-**What exists**: Camera FAB already exists at bottom-right. Gallery view already handles empty photo arrays.
-
-**Acceptance criteria**:
-- Guest sees: encouraging message + arrow/animation pointing to camera FAB
+**Acceptance criteria** (all met):
+- Guest sees: encouraging message + animated arrow pointing to camera FAB
 - Couple sees: message + share button to invite guests
 - Feels warm and wedding-appropriate, not clinical
 
