@@ -143,7 +143,8 @@ export const getBySlug = query({
   handler: async (ctx, { slug }) => {
     const event = await Events.getEventBySlug(ctx, slug);
     if (!event) return null;
-    const { coverPhotoStorageId, ...publicEvent } = event;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { coverPhotoStorageId, coupleSecret, ...publicEvent } = event;
     const coverPhotoUrl = coverPhotoStorageId
       ? await ctx.storage.getUrl(coverPhotoStorageId)
       : null;
