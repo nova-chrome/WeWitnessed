@@ -18,11 +18,11 @@ import { EventEditDrawer } from "~/features/events/components/event-edit-drawer"
 import { EventShareDialog } from "~/features/events/components/event-share-dialog";
 import { useCoupleSession } from "~/features/events/hooks/use-couple-session";
 import { useGuestSession } from "~/features/guests/hooks/use-guest-session";
+import { PhotoLightbox } from "~/features/photos/components/photo-lightbox";
+import { VisibilityToggle } from "~/features/photos/components/visibility-toggle";
 import { cn } from "~/lib/utils";
-import { PhotoLightbox } from "./photo-lightbox";
-import type { ViewMode } from "./view-toggle";
-import { ViewToggle } from "./view-toggle";
-import { VisibilityToggle } from "./visibility-toggle";
+import type { ViewMode } from "~/features/gallery/components/view-toggle";
+import { ViewToggle } from "~/features/gallery/components/view-toggle";
 
 interface EventGalleryViewProps {
   slug: string;
