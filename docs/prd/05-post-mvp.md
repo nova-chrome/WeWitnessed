@@ -185,19 +185,20 @@ Features that improve the core photo capture and viewing loop.
 
 ---
 
-### 2.4 Photo Reactions
+### 2.4 Photo Reactions ✅
 
-**What**: Let guests react to photos with simple emoji reactions (heart, laugh, fire, etc.).
+**Status**: Complete
 
-**Where to build**:
-- Backend: New `reactions` table in `convex/schema.ts` with `photoId`, `guestId`/`deviceId`, `emoji`, `createdAt`
-- Backend: New `convex/reactions.ts` with `add`, `remove`, `getByPhoto` functions
-- Frontend: Reaction bar below each photo in lightbox + gallery
+**What was built**:
+- Backend: `reactions` table in `convex/schema.ts` with `photoId`, `eventId`, `deviceId`, `emoji`, `createdAt` and indexes `by_photo`, `by_photo_device`, `by_event`
+- Backend: `convex/reactions.ts` with `toggle`, `getByPhoto`, `getCountsByEvent` functions; business logic in `convex/model/reactions.ts`
+- Backend: Cascade-delete reactions in `convex/model/photos.ts` (photo delete) and `convex/model/events.ts` (event delete)
+- Frontend: `ReactionBar` component in `src/features/reactions/components/reaction-bar.tsx` — 5 emoji buttons with counts, highlights user's active reaction
+- Frontend: `ReactionBadge` component in `src/features/reactions/components/reaction-badge.tsx` — compact heart+count overlay for grid thumbnails
+- Frontend: Integrated into lightbox (`photo-lightbox.tsx`) and gallery (`event-gallery-view.tsx`) in both grid and list views
 
-**What exists**: Guest identity via deviceId. Photo lightbox component.
-
-**Acceptance criteria**:
-- Fixed set of 4-5 emoji options (not free-form)
+**Acceptance criteria** (all met):
+- Fixed set of 5 emoji options (heart, fire, laugh, cry, clap)
 - One reaction per guest per photo (tap again to remove)
 - Reaction count shown on photo in gallery grid
 - No authentication required (uses deviceId)
