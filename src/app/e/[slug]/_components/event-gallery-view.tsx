@@ -25,6 +25,8 @@ import { useGuestSession } from "~/features/guests/hooks/use-guest-session";
 import { PhotoLightbox } from "~/features/photos/components/photo-lightbox";
 import { usePhotoUpload } from "~/features/photos/hooks/use-photo-upload";
 import { VisibilityToggle } from "~/features/photos/components/visibility-toggle";
+import { ReactionBadge } from "~/features/reactions/components/reaction-badge";
+import { ReactionBar } from "~/features/reactions/components/reaction-bar";
 import { cn } from "~/lib/utils";
 import { tryCatch } from "~/utils/try-catch";
 import type { ViewMode } from "~/features/gallery/components/view-toggle";
@@ -47,6 +49,11 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
           ...(couple.coupleSecret ? { coupleSecret: couple.coupleSecret } : {}),
         }
       : "skip",
+  );
+
+  const reactionCounts = useQuery(
+    api.reactions.getCountsByEvent,
+    event ? { eventId: event._id } : "skip",
   );
 
   const { upload, isUploading } = usePhotoUpload();
@@ -327,16 +334,22 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
                   )}
                 >
                   {viewMode === "grid" ? (
-                    <Image
-                      src={photo.url}
-                      alt=""
-                      fill
-                      sizes="33vw"
-                      className={cn(
-                        "object-cover",
-                        couple.isCouple && !photo.isPublic && "opacity-50",
-                      )}
-                    />
+                    <>
+                      <Image
+                        src={photo.url}
+                        alt=""
+                        fill
+                        sizes="33vw"
+                        className={cn(
+                          "object-cover",
+                          couple.isCouple && !photo.isPublic && "opacity-50",
+                        )}
+                      />
+                      {(() => {
+                        const counts = (reactionCounts as Record<string, { total: number }> | undefined)?.[photo._id];
+                        return counts?.total ? <ReactionBadge total={counts.total} /> : null;
+                      })()}
+                    </>
                   ) : (
                     <>
                       <Image
@@ -355,6 +368,13 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
                           {photo.caption}
                         </p>
                       )}
+                      <div className="flex justify-center py-2">
+                        <ReactionBar
+                          photoId={photo._id}
+                          eventId={event._id}
+                          deviceId={guest.deviceId}
+                        />
+                      </div>
                     </>
                   )}
                   {couple.isCouple && !photo.isPublic && (
@@ -385,6 +405,7 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
             if (photos) setPhotoId(photos[index]._id);
           }}
           eventId={event._id}
+          deviceId={guest.deviceId}
           couple={
             couple.isCouple && couple.coupleSecret
               ? {

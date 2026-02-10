@@ -1,6 +1,7 @@
 import { ConvexError } from "convex/values";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
+import * as Reactions from "./reactions";
 
 export async function createPhoto(
   ctx: MutationCtx,
@@ -72,6 +73,7 @@ export async function deletePhoto(
 
   await ctx.storage.delete(photo.storageId);
   await ctx.db.delete(photoId);
+  await Reactions.deletePhotoReactions(ctx, photoId);
 }
 
 export async function getPublicPhotoCount(
