@@ -162,22 +162,25 @@ Features that improve the core photo capture and viewing loop.
 
 ---
 
-### 2.3 Photo Captions
+### 2.3 Photo Captions ✅
 
-**What**: Let guests add a short message when uploading a photo.
+**Status**: Complete
 
-**Where to build**:
-- Backend: Add `caption` (optional string) field to `photos` table in `convex/schema.ts`
-- Backend: Accept `caption` in `photos.create` mutation
-- Frontend: Add text input to the upload flow (after capture, before upload)
-- Frontend: Show caption below photo in gallery list view and in lightbox
+**What was built**:
 
-**What exists**: Photos table in `convex/schema.ts`. `usePhotoUpload` hook. Gallery views.
+- Backend: `caption: v.optional(v.string())` field on `photos` table in `convex/schema.ts`
+- Backend: `updateCaption` mutation in `convex/photos.ts` (guest-only auth via deviceId)
+- Backend: `updatePhotoCaption` in `convex/model/photos.ts`
+- Frontend: `PhotoCaption` component in `src/features/photos/components/photo-caption.tsx` — inline edit with textarea, save/cancel, character counter
+- Frontend: Integrated into lightbox (`photo-lightbox.tsx`) and list view (`event-gallery-view.tsx`) with gradient overlay
 
-**Acceptance criteria**:
+**Acceptance criteria** (all met):
+
 - Caption is optional (can skip)
-- Max 200 characters
+- Max 200 characters (enforced client + server)
+- Added post-upload (not during), keeping uploads fast
 - Visible in lightbox and list view
+- Only the photo owner can add/edit captions
 - Couple can see captions on all photos
 
 ---
