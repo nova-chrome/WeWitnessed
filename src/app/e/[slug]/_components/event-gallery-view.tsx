@@ -12,7 +12,8 @@ import {
 import Image from "next/image";
 import { Skeleton } from "~/components/ui/skeleton";
 import Link from "next/link";
-import { useCallback, useRef, useState } from "react";
+import { useQueryState, parseAsString } from "nuqs";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { api } from "~/convex/_generated/api";
@@ -52,19 +53,30 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
-    null,
+  const [photoId, setPhotoId] = useQueryState(
+    "photo",
+    parseAsString.withOptions({ history: "replace" }),
   );
   const [editOpen, setEditOpen] = useState(false);
   const [showNamePrompt, setShowNamePrompt] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
+  const selectedPhotoIndex = useMemo(() => {
+    if (!photoId || !photos) return null;
+    const index = photos.findIndex((p) => p._id === photoId);
+    if (index === -1) {
+      setPhotoId(null);
+      return null;
+    }
+    return index;
+  }, [photoId, photos, setPhotoId]);
+
   function handlePhotoClick(index: number) {
-    setSelectedPhotoIndex(index);
+    if (photos) setPhotoId(photos[index]._id);
   }
 
   function handleLightboxClose() {
-    setSelectedPhotoIndex(null);
+    setPhotoId(null);
   }
 
   function toggleViewMode() {
@@ -362,7 +374,9 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
           photos={photos}
           selectedIndex={selectedPhotoIndex}
           onClose={handleLightboxClose}
-          onNavigate={setSelectedPhotoIndex}
+          onNavigate={(index) => {
+            if (photos) setPhotoId(photos[index]._id);
+          }}
           eventId={event._id}
           couple={
             couple.isCouple && couple.coupleSecret

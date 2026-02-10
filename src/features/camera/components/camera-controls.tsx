@@ -2,16 +2,21 @@
 
 import { format } from "date-fns";
 import { ImageIcon, SettingsIcon } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 interface CameraControlsProps {
   onCapture: () => void | Promise<void>;
   isCapturing: boolean;
+  galleryHref?: string;
+  lastThumbnailUrl?: string | null;
 }
 
 export function CameraControls({
   onCapture,
   isCapturing,
+  galleryHref,
+  lastThumbnailUrl,
 }: CameraControlsProps) {
   const [currentTime, setCurrentTime] = useState(() =>
     format(new Date(), "h:mm a"),
@@ -58,12 +63,31 @@ export function CameraControls({
         </button>
 
         {/* Gallery */}
-        <button
-          className="flex items-center justify-center size-12 rounded-full border-2 border-white/50 transition-all hover:bg-white/10 active:scale-95 overflow-hidden"
-          aria-label="Open gallery"
-        >
-          <ImageIcon className="size-6 text-white drop-shadow-md" />
-        </button>
+        {galleryHref ? (
+          <Link
+            href={galleryHref}
+            className="flex items-center justify-center size-12 rounded-full border-2 border-white/50 transition-all hover:bg-white/10 active:scale-95 overflow-hidden"
+            aria-label="View gallery"
+          >
+            {lastThumbnailUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={lastThumbnailUrl}
+                alt=""
+                className="size-full object-cover"
+              />
+            ) : (
+              <ImageIcon className="size-6 text-white drop-shadow-md" />
+            )}
+          </Link>
+        ) : (
+          <button
+            className="flex items-center justify-center size-12 rounded-full border-2 border-white/50 transition-all hover:bg-white/10 active:scale-95 overflow-hidden"
+            aria-label="Open gallery"
+          >
+            <ImageIcon className="size-6 text-white drop-shadow-md" />
+          </button>
+        )}
       </div>
     </div>
   );

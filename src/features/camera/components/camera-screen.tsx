@@ -14,14 +14,20 @@ import { CameraSettings } from "./camera-settings";
 
 interface CameraScreenProps {
   backHref?: string;
-  isUploading?: boolean;
+  galleryHref?: string;
   onPhotoCaptured?: (blob: Blob) => void;
+  sessionCount?: number;
+  lastThumbnailUrl?: string | null;
+  hasActiveUploads?: boolean;
 }
 
 export function CameraScreen({
   backHref,
-  isUploading,
+  galleryHref,
   onPhotoCaptured,
+  sessionCount = 0,
+  lastThumbnailUrl,
+  hasActiveUploads,
 }: CameraScreenProps) {
   const {
     videoRef,
@@ -113,18 +119,6 @@ export function CameraScreen({
         </div>
       )}
 
-      {/* Upload overlay */}
-      {isUploading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/40 backdrop-blur-sm">
-          <div className="flex flex-col items-center gap-3">
-            <div className="size-10 animate-spin rounded-full border-3 border-foreground border-t-transparent" />
-            <span className="text-sm font-medium text-foreground">
-              Uploading...
-            </span>
-          </div>
-        </div>
-      )}
-
       {/* Top Camera Settings */}
       {isReady && !error && (
         <CameraSettings
@@ -132,13 +126,20 @@ export function CameraScreen({
           zoomLevel={zoomLevel}
           onZoomChange={setZoom}
           onToggleCamera={toggleCamera}
+          sessionCount={sessionCount}
+          hasActiveUploads={hasActiveUploads}
         />
       )}
 
       {/* Bottom Controls Area */}
       <div className="absolute bottom-0 left-0 right-0 h-44">
         {isReady && !error && (
-          <CameraControls onCapture={handleCapture} isCapturing={isCapturing} />
+          <CameraControls
+            onCapture={handleCapture}
+            isCapturing={isCapturing}
+            galleryHref={galleryHref ?? backHref}
+            lastThumbnailUrl={lastThumbnailUrl}
+          />
         )}
       </div>
     </div>

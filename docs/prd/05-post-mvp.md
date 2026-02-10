@@ -140,19 +140,24 @@ Features that improve the core photo capture and viewing loop.
 
 ---
 
-### 2.2 Multi-Photo Capture
+### 2.2 Multi-Photo Capture ✅
 
-**What**: Let guests take multiple photos in succession without returning to the gallery each time.
+**Status**: Complete
 
-**Where to build**: `src/app/e/[slug]/camera/_components/event-camera-view.tsx`
+**What was built**:
 
-**What exists**: Camera captures one photo, uploads, then sits on the camera screen. The upload overlay blocks during upload.
+- New `useCaptureSession` hook (`src/features/photos/hooks/use-capture-session.ts`) — fire-and-forget captures with blob thumbnails, session count, and per-capture status tracking
+- Refactored `usePhotoUpload` (`src/features/photos/hooks/use-photo-upload.ts`) to support concurrent uploads via `activeCount` counter instead of single `isUploading` boolean
+- Rewired `EventCameraView` to use `useCaptureSession` — removed blocking upload guard and per-photo toasts
+- Removed full-screen upload overlay from `CameraScreen`, replaced with session counter pill below zoom controls in `CameraSettings`
+- Gallery button in `CameraControls` now a `Link` to event page, shows last capture thumbnail (iOS Camera style)
 
-**Acceptance criteria**:
+**Acceptance criteria** (all met):
+
 - After capture, camera stays active for next shot (no navigation away)
-- Small thumbnail preview of last capture appears in corner
+- Small thumbnail preview of last capture appears in gallery button
 - Upload happens in background (non-blocking)
-- Counter shows "3 photos taken" during session
+- Counter shows "3 photos" during session below zoom controls
 - Guest can return to gallery when done
 
 ---

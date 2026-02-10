@@ -15,7 +15,7 @@ interface PhotoUpload {
 }
 
 export function usePhotoUpload(): PhotoUpload {
-  const [isUploading, setIsUploading] = useState(false);
+  const [activeCount, setActiveCount] = useState(0);
   const generateUploadUrl = useMutation(api.photos.generateUploadUrl);
   const createPhoto = useMutation(api.photos.create);
 
@@ -25,7 +25,7 @@ export function usePhotoUpload(): PhotoUpload {
       guestId: Id<"guests"> | null,
       blob: Blob,
     ): Promise<Id<"photos">> => {
-      setIsUploading(true);
+      setActiveCount((c) => c + 1);
       try {
         const uploadUrl = await generateUploadUrl();
 
@@ -51,11 +51,11 @@ export function usePhotoUpload(): PhotoUpload {
 
         return photoId;
       } finally {
-        setIsUploading(false);
+        setActiveCount((c) => c - 1);
       }
     },
     [generateUploadUrl, createPhoto],
   );
 
-  return { upload, isUploading };
+  return { upload, isUploading: activeCount > 0 };
 }
