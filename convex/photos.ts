@@ -37,6 +37,7 @@ export const getByEvent = query({
       guestId: v.optional(v.id("guests")),
       storageId: v.id("_storage"),
       isPublic: v.boolean(),
+      caption: v.optional(v.string()),
       createdAt: v.number(),
       url: v.union(v.string(), v.null()),
     }),
@@ -110,6 +111,49 @@ export const remove = mutation({
       code: "Forbidden",
       message: "No valid credentials provided",
     });
+  },
+});
+
+export const updateCaption = mutation({
+  args: {
+    photoId: v.id("photos"),
+    eventId: v.id("events"),
+    deviceId: v.string(),
+    caption: v.optional(v.string()),
+  },
+  returns: v.null(),
+  handler: async (ctx, { photoId, eventId, deviceId, caption }) => {
+    const guest = await Guests.getGuestByDevice(ctx, eventId, deviceId);
+    if (!guest) {
+      throw new ConvexError({
+        code: "Forbidden",
+        message: "Guest not found for this device",
+      });
+    }
+
+    const photo = await ctx.db.get(photoId);
+    if (!photo) {
+      throw new ConvexError({
+        code: "NotFound",
+        message: "Photo not found",
+      });
+    }
+    if (photo.guestId !== guest._id) {
+      throw new ConvexError({
+        code: "Forbidden",
+        message: "You can only caption your own photos",
+      });
+    }
+
+    if (caption && caption.length > 200) {
+      throw new ConvexError({
+        code: "BadRequest",
+        message: "Caption must be 200 characters or less",
+      });
+    }
+
+    await Photos.updatePhotoCaption(ctx, photoId, caption);
+    return null;
   },
 });
 

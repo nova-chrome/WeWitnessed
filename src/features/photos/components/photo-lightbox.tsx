@@ -18,6 +18,7 @@ import type { Id } from "~/convex/_generated/dataModel";
 import { cn } from "~/lib/utils";
 import { tryCatch } from "~/utils/try-catch";
 import { DeletePhotoButton } from "./delete-photo-button";
+import { PhotoCaption } from "./photo-caption";
 import { VisibilityToggle } from "./visibility-toggle";
 
 interface Photo {
@@ -25,6 +26,7 @@ interface Photo {
   url: string | null;
   isPublic: boolean;
   guestId?: Id<"guests">;
+  caption?: string;
 }
 
 interface CoupleInfo {
@@ -201,6 +203,20 @@ export function PhotoLightbox({
                   couple?.isCouple && !photo.isPublic && "opacity-50",
                 )}
                 priority
+              />
+            </div>
+          )}
+
+          {/* Caption */}
+          {photo?.url && (
+            <div className="absolute bottom-14 left-0 right-0 z-10">
+              <PhotoCaption
+                key={photo._id}
+                photoId={photo._id}
+                eventId={eventId}
+                caption={photo.caption}
+                isOwner={!!guest?.guestId && photo.guestId === guest.guestId}
+                deviceId={guest?.deviceId}
               />
             </div>
           )}

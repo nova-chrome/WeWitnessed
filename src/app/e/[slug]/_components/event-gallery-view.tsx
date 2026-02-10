@@ -338,17 +338,24 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
                       )}
                     />
                   ) : (
-                    <Image
-                      src={photo.url}
-                      alt=""
-                      width={600}
-                      height={600}
-                      sizes="(max-width: 512px) 100vw, 512px"
-                      className={cn(
-                        "w-full h-auto",
-                        couple.isCouple && !photo.isPublic && "opacity-50",
+                    <>
+                      <Image
+                        src={photo.url}
+                        alt=""
+                        width={600}
+                        height={600}
+                        sizes="(max-width: 512px) 100vw, 512px"
+                        className={cn(
+                          "w-full h-auto",
+                          couple.isCouple && !photo.isPublic && "opacity-50",
+                        )}
+                      />
+                      {photo.caption && (
+                        <p className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 to-transparent px-3 pb-2.5 pt-6 text-sm text-white/80">
+                          {photo.caption}
+                        </p>
                       )}
-                    />
+                    </>
                   )}
                   {couple.isCouple && !photo.isPublic && (
                     <div className="absolute inset-0 bg-black/30 pointer-events-none" />
