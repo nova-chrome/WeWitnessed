@@ -1,6 +1,7 @@
 import { ConvexError } from "convex/values";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
+import * as Reactions from "./reactions";
 
 const SLUG_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -209,6 +210,9 @@ export async function deleteEvent(
     .collect();
 
   await Promise.all(guests.map((guest) => ctx.db.delete(guest._id)));
+
+  // Delete all reactions
+  await Reactions.deleteEventReactions(ctx, eventId);
 
   // Delete the event itself
   await ctx.db.delete(eventId);

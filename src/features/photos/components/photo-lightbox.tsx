@@ -17,6 +17,7 @@ import {
 import type { Id } from "~/convex/_generated/dataModel";
 import { cn } from "~/lib/utils";
 import { tryCatch } from "~/utils/try-catch";
+import { ReactionBar } from "~/features/reactions/components/reaction-bar";
 import { DeletePhotoButton } from "./delete-photo-button";
 import { PhotoCaption } from "./photo-caption";
 import { VisibilityToggle } from "./visibility-toggle";
@@ -46,6 +47,7 @@ interface PhotoLightboxProps {
   onClose: () => void;
   onNavigate: (index: number) => void;
   eventId: Id<"events">;
+  deviceId?: string;
   couple?: CoupleInfo;
   guest?: GuestInfo;
 }
@@ -66,6 +68,7 @@ export function PhotoLightbox({
   onClose,
   onNavigate,
   eventId,
+  deviceId,
   couple,
   guest,
 }: PhotoLightboxProps) {
@@ -203,6 +206,18 @@ export function PhotoLightbox({
                   couple?.isCouple && !photo.isPublic && "opacity-50",
                 )}
                 priority
+              />
+            </div>
+          )}
+
+          {/* Reactions */}
+          {photo?.url && (
+            <div className="absolute bottom-24 left-0 right-0 z-10 flex justify-center">
+              <ReactionBar
+                key={`reactions-${photo._id}`}
+                photoId={photo._id}
+                eventId={eventId}
+                deviceId={deviceId}
               />
             </div>
           )}

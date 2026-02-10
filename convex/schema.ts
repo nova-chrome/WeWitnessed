@@ -31,4 +31,21 @@ export default defineSchema({
     .index("by_event", ["eventId"])
     .index("by_event_public", ["eventId", "isPublic"])
     .index("by_guest", ["guestId"]),
+
+  reactions: defineTable({
+    photoId: v.id("photos"),
+    eventId: v.id("events"),
+    deviceId: v.string(),
+    emoji: v.union(
+      v.literal("heart"),
+      v.literal("fire"),
+      v.literal("laugh"),
+      v.literal("cry"),
+      v.literal("clap"),
+    ),
+    createdAt: v.number(),
+  })
+    .index("by_photo", ["photoId"])
+    .index("by_photo_device", ["photoId", "deviceId"])
+    .index("by_event", ["eventId"]),
 });
