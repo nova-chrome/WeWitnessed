@@ -84,7 +84,7 @@ export function PhotoCaption({
           maxLength={MAX_CAPTION_LENGTH}
           rows={2}
           autoFocus
-          className="min-h-0 resize-none border-white/20 bg-black/40 text-sm text-white backdrop-blur-md placeholder:text-white/40"
+          className="min-h-0 resize-none border-white/20 bg-black/40 text-base text-white backdrop-blur-md placeholder:text-white/40"
           onKeyDown={(e) => {
             e.stopPropagation();
             if (e.key === "Escape") handleCancel();
