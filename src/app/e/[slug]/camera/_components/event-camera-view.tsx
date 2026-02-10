@@ -2,13 +2,11 @@
 
 import { useQuery } from "convex/react";
 import { useCallback, useState } from "react";
-import { toast } from "sonner";
 import { api } from "~/convex/_generated/api";
 import { CameraScreen } from "~/features/camera/components/camera-screen";
 import { GuestNameDialog } from "~/features/guests/components/guest-name-dialog";
 import { useGuestSession } from "~/features/guests/hooks/use-guest-session";
-import { usePhotoUpload } from "~/features/photos/hooks/use-photo-upload";
-import { tryCatch } from "~/utils/try-catch";
+import { useCaptureSession } from "~/features/photos/hooks/use-capture-session";
 
 interface EventCameraViewProps {
   slug: string;
@@ -17,36 +15,15 @@ interface EventCameraViewProps {
 export function EventCameraView({ slug }: EventCameraViewProps) {
   const event = useQuery(api.events.getBySlug, { slug });
   const { guestId, createGuest } = useGuestSession(slug, event?._id);
-  const { upload, isUploading } = usePhotoUpload();
+  const { addCapture, sessionCount, lastThumbnailUrl, hasActiveUploads } =
+    useCaptureSession(event?._id, guestId);
 
   const [showNamePrompt, setShowNamePrompt] = useState(false);
   const [pendingBlob, setPendingBlob] = useState<Blob | null>(null);
 
-  const uploadPhoto = useCallback(
-    async (blob: Blob, resolvedGuestId: string | null) => {
-      if (!event) return;
-
-      const { error } = await tryCatch(
-        upload(
-          event._id,
-          resolvedGuestId as Parameters<typeof upload>[1],
-          blob,
-        ),
-      );
-
-      if (error) {
-        toast.error("Upload failed. Please try again.");
-        return;
-      }
-
-      toast.success("Photo uploaded!");
-    },
-    [event, upload],
-  );
-
   const handlePhotoCaptured = useCallback(
-    async (blob: Blob) => {
-      if (!event || isUploading) return;
+    (blob: Blob) => {
+      if (!event) return;
 
       if (!guestId && !showNamePrompt) {
         setPendingBlob(blob);
@@ -54,9 +31,9 @@ export function EventCameraView({ slug }: EventCameraViewProps) {
         return;
       }
 
-      await uploadPhoto(blob, guestId);
+      addCapture(blob);
     },
-    [event, guestId, isUploading, showNamePrompt, uploadPhoto],
+    [event, guestId, showNamePrompt, addCapture],
   );
 
   const handleNameDialogClose = useCallback(() => {
@@ -86,16 +63,18 @@ export function EventCameraView({ slug }: EventCameraViewProps) {
     <div className="relative h-svh overflow-hidden">
       <CameraScreen
         backHref={`/e/${slug}`}
-        isUploading={isUploading}
         onPhotoCaptured={handlePhotoCaptured}
+        sessionCount={sessionCount}
+        lastThumbnailUrl={lastThumbnailUrl}
+        hasActiveUploads={hasActiveUploads}
       />
 
       <GuestNameDialog
         open={showNamePrompt}
         createGuest={createGuest}
-        onComplete={async (resolvedGuestId) => {
+        onComplete={async () => {
           setShowNamePrompt(false);
-          if (pendingBlob) await uploadPhoto(pendingBlob, resolvedGuestId);
+          if (pendingBlob) addCapture(pendingBlob);
           setPendingBlob(null);
         }}
         onClose={handleNameDialogClose}
