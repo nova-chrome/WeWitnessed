@@ -32,8 +32,9 @@ export function useCaptureSession(
   const blobUrlsRef = useRef<string[]>([]);
 
   useEffect(() => {
+    const urls = blobUrlsRef.current;
     return () => {
-      for (const url of blobUrlsRef.current) {
+      for (const url of urls) {
         URL.revokeObjectURL(url);
       }
     };
