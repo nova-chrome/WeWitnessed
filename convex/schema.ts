@@ -25,6 +25,7 @@ export default defineSchema({
     guestId: v.optional(v.id("guests")),
     storageId: v.id("_storage"),
     isPublic: v.boolean(),
+    caption: v.optional(v.string()),
     createdAt: v.number(),
   })
     .index("by_event", ["eventId"])

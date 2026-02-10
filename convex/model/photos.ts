@@ -102,6 +102,18 @@ export async function getLatestPublicPhotoUrl(
   return ctx.storage.getUrl(photo.storageId);
 }
 
+export async function updatePhotoCaption(
+  ctx: MutationCtx,
+  photoId: Id<"photos">,
+  caption: string | undefined,
+): Promise<void> {
+  const photo = await ctx.db.get(photoId);
+  if (!photo) {
+    throw new ConvexError({ code: "NotFound", message: "Photo not found" });
+  }
+  await ctx.db.patch(photoId, { caption: caption || undefined });
+}
+
 export async function togglePhotoVisibility(
   ctx: MutationCtx,
   photoId: Id<"photos">,
