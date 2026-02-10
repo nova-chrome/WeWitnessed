@@ -11,12 +11,14 @@ interface CaptureEntry {
   id: string;
   thumbnailUrl: string;
   status: CaptureStatus;
+  photoId?: Id<"photos">;
 }
 
 interface CaptureSession {
   addCapture: (blob: Blob) => void;
   sessionCount: number;
   lastThumbnailUrl: string | null;
+  lastCompletedPhotoId: Id<"photos"> | null;
   activeUploads: number;
   hasActiveUploads: boolean;
 }
@@ -50,11 +52,11 @@ export function useCaptureSession(
         { id, thumbnailUrl, status: "uploading" },
       ]);
 
-      tryCatch(upload(eventId, guestId, blob)).then(({ error }) => {
+      tryCatch(upload(eventId, guestId, blob)).then(({ data, error }) => {
         setCaptures((prev) =>
           prev.map((c) =>
             c.id === id
-              ? { ...c, status: error ? "error" : "success" }
+              ? { ...c, status: error ? "error" : "success", photoId: data ?? undefined }
               : c,
           ),
         );
@@ -68,6 +70,14 @@ export function useCaptureSession(
     captures.length > 0
       ? captures[captures.length - 1].thumbnailUrl
       : null;
+  const lastCompletedPhotoId: Id<"photos"> | null = (() => {
+    for (let i = captures.length - 1; i >= 0; i--) {
+      if (captures[i].status === "success" && captures[i].photoId) {
+        return captures[i].photoId!;
+      }
+    }
+    return null;
+  })();
   const activeUploads = captures.filter(
     (c) => c.status === "uploading",
   ).length;
@@ -76,6 +86,7 @@ export function useCaptureSession(
     addCapture,
     sessionCount,
     lastThumbnailUrl,
+    lastCompletedPhotoId,
     activeUploads,
     hasActiveUploads: activeUploads > 0,
   };

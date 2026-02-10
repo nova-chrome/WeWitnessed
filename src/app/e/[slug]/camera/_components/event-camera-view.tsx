@@ -15,8 +15,13 @@ interface EventCameraViewProps {
 export function EventCameraView({ slug }: EventCameraViewProps) {
   const event = useQuery(api.events.getBySlug, { slug });
   const { guestId, createGuest } = useGuestSession(slug, event?._id);
-  const { addCapture, sessionCount, lastThumbnailUrl, hasActiveUploads } =
-    useCaptureSession(event?._id, guestId);
+  const {
+    addCapture,
+    sessionCount,
+    lastThumbnailUrl,
+    lastCompletedPhotoId,
+    hasActiveUploads,
+  } = useCaptureSession(event?._id, guestId);
 
   const [showNamePrompt, setShowNamePrompt] = useState(false);
   const [pendingBlob, setPendingBlob] = useState<Blob | null>(null);
@@ -63,6 +68,7 @@ export function EventCameraView({ slug }: EventCameraViewProps) {
     <div className="relative h-svh overflow-hidden">
       <CameraScreen
         backHref={`/e/${slug}`}
+        galleryHref={`/e/${slug}${lastCompletedPhotoId ? `?photo=${lastCompletedPhotoId}` : ""}`}
         onPhotoCaptured={handlePhotoCaptured}
         sessionCount={sessionCount}
         lastThumbnailUrl={lastThumbnailUrl}

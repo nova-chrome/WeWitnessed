@@ -100,9 +100,12 @@ export function PhotoLightbox({
       onClose();
       return;
     }
-    if (selectedIndex >= photos.length - 1) {
-      onNavigate(selectedIndex - 1);
-    }
+    // Navigate to the next photo, or previous if deleting the last one
+    const nextIndex =
+      selectedIndex >= photos.length - 1
+        ? selectedIndex - 1
+        : selectedIndex + 1;
+    onNavigate(nextIndex);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {

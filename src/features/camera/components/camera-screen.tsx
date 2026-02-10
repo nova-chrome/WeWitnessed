@@ -14,6 +14,7 @@ import { CameraSettings } from "./camera-settings";
 
 interface CameraScreenProps {
   backHref?: string;
+  galleryHref?: string;
   onPhotoCaptured?: (blob: Blob) => void;
   sessionCount?: number;
   lastThumbnailUrl?: string | null;
@@ -22,6 +23,7 @@ interface CameraScreenProps {
 
 export function CameraScreen({
   backHref,
+  galleryHref,
   onPhotoCaptured,
   sessionCount = 0,
   lastThumbnailUrl,
@@ -135,7 +137,7 @@ export function CameraScreen({
           <CameraControls
             onCapture={handleCapture}
             isCapturing={isCapturing}
-            galleryHref={backHref}
+            galleryHref={galleryHref ?? backHref}
             lastThumbnailUrl={lastThumbnailUrl}
           />
         )}
