@@ -16,6 +16,7 @@ import {
 } from "~/components/ui/dialog";
 import type { Id } from "~/convex/_generated/dataModel";
 import { cn } from "~/lib/utils";
+import { tryCatch } from "~/utils/try-catch";
 import { DeletePhotoButton } from "./delete-photo-button";
 import { VisibilityToggle } from "./visibility-toggle";
 
@@ -74,10 +75,21 @@ export function PhotoLightbox({
     if (!photo?.url) return;
     const response = await fetch(photo.url);
     const blob = await response.blob();
+    const filename = `photo-${photo._id}.jpg`;
+
+    // On iOS, use the native share sheet so users can "Save Image" to Photos.
+    // The <a download> pattern on iOS Safari saves to Files instead of Photos.
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS && navigator.canShare?.({ files: [new File([blob], filename)] })) {
+      const file = new File([blob], filename, { type: blob.type });
+      await tryCatch(navigator.share({ files: [file] }));
+      return;
+    }
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `photo-${photo._id}.jpg`;
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
   }
