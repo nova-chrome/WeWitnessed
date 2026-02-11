@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { api } from "~/convex/_generated/api";
 import type { Id } from "~/convex/_generated/dataModel";
+import { EventDateDisplay } from "~/features/events/components/event-date-display";
 import { EventEditDrawer } from "~/features/events/components/event-edit-drawer";
 import { EventShareDialog } from "~/features/events/components/event-share-dialog";
 import { useCoupleSession } from "~/features/events/hooks/use-couple-session";
@@ -258,6 +259,7 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
               Couple View
             </span>
           )}
+          <EventDateDisplay date={event?.date} />
           {photos && photos.length > 0 && (
             <p className="text-muted-foreground text-xs tracking-wide">
               {photos.length} {photos.length === 1 ? "photo" : "photos"}
