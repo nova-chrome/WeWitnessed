@@ -73,8 +73,8 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
   );
   const filteredGuest = useQuery(
     api.guests.getById,
-    guestFilter
-      ? { guestId: guestFilter as Id<"guests"> }
+    guestFilter && event
+      ? { guestId: guestFilter as Id<"guests">, eventId: event._id }
       : "skip",
   );
 

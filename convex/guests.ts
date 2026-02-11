@@ -52,7 +52,10 @@ export const getByDevice = query({
 });
 
 export const getById = query({
-  args: { guestId: v.id("guests") },
+  args: {
+    guestId: v.id("guests"),
+    eventId: v.id("events"),
+  },
   returns: v.union(
     v.null(),
     v.object({
@@ -60,9 +63,10 @@ export const getById = query({
       name: v.string(),
     }),
   ),
-  handler: async (ctx, { guestId }) => {
+  handler: async (ctx, { guestId, eventId }) => {
     const guest = await ctx.db.get(guestId);
-    if (!guest) return null;
+    // Verify guest exists and belongs to the specified event
+    if (!guest || guest.eventId !== eventId) return null;
     return { _id: guest._id, name: guest.name };
   },
 });
