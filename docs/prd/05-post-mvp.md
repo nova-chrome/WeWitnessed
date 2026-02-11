@@ -269,17 +269,17 @@ Give the couple a proper management surface beyond the inline gallery controls.
 
 ---
 
-### 3.2 Guest List View
+### 3.2 Guest List View ✅
 
-**What**: Show the couple who has contributed photos.
+**Status**: Complete
 
-**Where to build**:
-- Backend: Add query in `convex/guests.ts` — `getByEvent(eventId)` returning guests with photo counts
-- Frontend: Section in couple dashboard or standalone tab
+**What was built**:
+- Backend: `getGuestsWithPhotoCounts` in `convex/model/guests.ts` fetches guests + photos in parallel, computes per-guest photo count and latest activity timestamp
+- Backend: Updated `listByEvent` query in `convex/guests.ts` to return enriched guest data; added `getById` query for guest name lookups
+- Frontend: Enhanced `GuestListDrawer` in couple dashboard with photo counts, activity timestamps, and tappable rows linking to filtered gallery
+- Frontend: Added `?guest=<id>` URL param filtering to gallery via nuqs with filter banner and clear button
 
-**What exists**: `by_event` index on guests table. `by_guest` index on photos table.
-
-**Acceptance criteria**:
+**Acceptance criteria** (all met):
 - List of guest names with photo count per guest
 - Sorted by most recent activity
 - Tapping a guest filters gallery to their photos
