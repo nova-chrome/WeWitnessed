@@ -25,6 +25,7 @@ import { EventEditDrawer } from "~/features/events/components/event-edit-drawer"
 import { EventShareDialog } from "~/features/events/components/event-share-dialog";
 import { useCoupleSession } from "~/features/events/hooks/use-couple-session";
 import { cn } from "~/lib/utils";
+import { GuestListDrawer } from "./guest-list-drawer";
 
 interface ManageDashboardProps {
   slug: string;
@@ -42,6 +43,7 @@ export function ManageDashboard({ slug }: ManageDashboardProps) {
   );
 
   const [editOpen, setEditOpen] = useState(false);
+  const [guestDrawerOpen, setGuestDrawerOpen] = useState(false);
 
   // Loading state
   if (event === undefined || couple.isLoading) {
@@ -136,6 +138,7 @@ export function ManageDashboard({ slug }: ManageDashboardProps) {
             icon={<UsersIcon className="size-4" />}
             value={stats?.guestCount}
             label="Guests"
+            onClick={() => setGuestDrawerOpen(true)}
           />
           <StatCard
             icon={<CameraIcon className="size-4" />}
@@ -226,6 +229,14 @@ export function ManageDashboard({ slug }: ManageDashboardProps) {
         </section>
       </div>
 
+      {/* Guest List Drawer */}
+      <GuestListDrawer
+        open={guestDrawerOpen}
+        onOpenChange={setGuestDrawerOpen}
+        eventId={event._id}
+        coupleSecret={couple.coupleSecret}
+      />
+
       {/* Edit Event Drawer */}
       <EventEditDrawer
         open={editOpen}
@@ -244,13 +255,23 @@ function StatCard({
   icon,
   value,
   label,
+  onClick,
 }: {
   icon: React.ReactNode;
   value: number | string | null | undefined;
   label: string;
+  onClick?: () => void;
 }) {
+  const Component = onClick ? "button" : "div";
+
   return (
-    <div className="flex flex-col items-center gap-1.5 rounded-lg border border-border bg-card/50 p-3">
+    <Component
+      onClick={onClick}
+      className={cn(
+        "flex flex-col items-center gap-1.5 rounded-lg border border-border bg-card/50 p-3",
+        onClick && "cursor-pointer hover:bg-foreground/5 transition-colors",
+      )}
+    >
       <div className="text-muted-foreground">{icon}</div>
       <div className="flex items-center justify-center min-h-7">
         {value === undefined ? (
@@ -266,10 +287,15 @@ function StatCard({
           </span>
         )}
       </div>
-      <span className="text-muted-foreground/60 text-[10px] tracking-wider uppercase">
+      <span
+        className={cn(
+          "text-muted-foreground/60 text-[10px] tracking-wider uppercase",
+          onClick && "underline underline-offset-2",
+        )}
+      >
         {label}
       </span>
-    </div>
+    </Component>
   );
 }
 
