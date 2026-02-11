@@ -2,7 +2,8 @@
 
 import { useQuery } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
-import { UsersIcon } from "lucide-react";
+import { CameraIcon, ChevronRightIcon, UsersIcon } from "lucide-react";
+import Link from "next/link";
 import {
   Drawer,
   DrawerContent,
@@ -13,12 +14,14 @@ import {
 import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/convex/_generated/api";
 import type { Id } from "~/convex/_generated/dataModel";
+import { cn } from "~/lib/utils";
 
 interface GuestListDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   eventId: Id<"events">;
   coupleSecret: string;
+  slug: string;
 }
 
 export function GuestListDrawer({
@@ -26,6 +29,7 @@ export function GuestListDrawer({
   onOpenChange,
   eventId,
   coupleSecret,
+  slug,
 }: GuestListDrawerProps) {
   const guests = useQuery(
     api.guests.listByEvent,
@@ -48,7 +52,7 @@ export function GuestListDrawer({
           {guests === undefined ? (
             <div className="space-y-3">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-12 rounded-lg" />
+                <Skeleton key={i} className="h-14 rounded-lg" />
               ))}
             </div>
           ) : guests === null || guests.length === 0 ? (
@@ -62,15 +66,33 @@ export function GuestListDrawer({
           ) : (
             <div className="divide-y divide-border rounded-lg border border-border bg-card/50">
               {guests.map((guest) => (
-                <div
+                <Link
                   key={guest._id}
-                  className="flex items-center justify-between px-4 py-3"
+                  href={`/e/${slug}?guest=${guest._id}`}
+                  onClick={() => onOpenChange(false)}
+                  className={cn(
+                    "flex items-center justify-between px-4 py-3 transition-colors hover:bg-foreground/5",
+                    guest.photoCount === 0 && "opacity-60",
+                  )}
                 >
-                  <span className="text-sm text-foreground">{guest.name}</span>
-                  <span className="text-xs text-muted-foreground/60">
-                    {formatDistanceToNow(guest.createdAt, { addSuffix: true })}
-                  </span>
-                </div>
+                  <div className="flex flex-col gap-0.5 min-w-0">
+                    <span className="text-sm text-foreground truncate">
+                      {guest.name}
+                    </span>
+                    <span className="text-xs text-muted-foreground/60">
+                      {guest.latestPhotoAt
+                        ? `Last photo ${formatDistanceToNow(guest.latestPhotoAt, { addSuffix: true })}`
+                        : `Joined ${formatDistanceToNow(guest.createdAt, { addSuffix: true })}`}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <CameraIcon className="size-3" />
+                      {guest.photoCount}
+                    </span>
+                    <ChevronRightIcon className="size-4 text-muted-foreground/40" />
+                  </div>
+                </Link>
               ))}
             </div>
           )}

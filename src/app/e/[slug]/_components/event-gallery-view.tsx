@@ -9,6 +9,7 @@ import {
   SettingsIcon,
   PencilIcon,
   Share2Icon,
+  XIcon,
 } from "lucide-react";
 import Image from "next/image";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -18,6 +19,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { api } from "~/convex/_generated/api";
+import type { Id } from "~/convex/_generated/dataModel";
 import { EventEditDrawer } from "~/features/events/components/event-edit-drawer";
 import { EventShareDialog } from "~/features/events/components/event-share-dialog";
 import { useCoupleSession } from "~/features/events/hooks/use-couple-session";
@@ -65,22 +67,39 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
     "photo",
     parseAsString.withOptions({ history: "replace" }),
   );
+  const [guestFilter, setGuestFilter] = useQueryState(
+    "guest",
+    parseAsString.withOptions({ history: "push" }),
+  );
+  const filteredGuest = useQuery(
+    api.guests.getById,
+    guestFilter
+      ? { guestId: guestFilter as Id<"guests"> }
+      : "skip",
+  );
+
+  const filteredPhotos = useMemo(() => {
+    if (!photos) return undefined;
+    if (!guestFilter) return photos;
+    return photos.filter((p) => p.guestId === guestFilter);
+  }, [photos, guestFilter]);
+
   const [editOpen, setEditOpen] = useState(false);
   const [showNamePrompt, setShowNamePrompt] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
   const selectedPhotoIndex = useMemo(() => {
-    if (!photoId || !photos) return null;
-    const index = photos.findIndex((p) => p._id === photoId);
+    if (!photoId || !filteredPhotos) return null;
+    const index = filteredPhotos.findIndex((p) => p._id === photoId);
     if (index === -1) {
       setPhotoId(null);
       return null;
     }
     return index;
-  }, [photoId, photos, setPhotoId]);
+  }, [photoId, filteredPhotos, setPhotoId]);
 
   function handlePhotoClick(index: number) {
-    if (photos) setPhotoId(photos[index]._id);
+    if (filteredPhotos) setPhotoId(filteredPhotos[index]._id);
   }
 
   function handleLightboxClose() {
@@ -184,7 +203,7 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
     );
   }
 
-  const hasPhotos = photos && photos.length > 0;
+  const hasPhotos = filteredPhotos && filteredPhotos.length > 0;
 
   return (
     <div className="relative min-h-svh bg-background overflow-hidden">
@@ -239,7 +258,7 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
               Couple View
             </span>
           )}
-          {hasPhotos && (
+          {photos && photos.length > 0 && (
             <p className="text-muted-foreground text-xs tracking-wide">
               {photos.length} {photos.length === 1 ? "photo" : "photos"}
             </p>
@@ -247,15 +266,56 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
         </div>
       </div>
 
+      {/* Guest filter banner */}
+      {guestFilter && (
+        <div className="relative flex items-center justify-between px-4 py-2 mb-1">
+          <p className="text-sm text-muted-foreground">
+            {filteredGuest ? (
+              <>
+                Photos by{" "}
+                <span className="text-foreground font-medium">
+                  {filteredGuest.name}
+                </span>
+              </>
+            ) : (
+              <Skeleton className="inline-block h-4 w-24 rounded" />
+            )}
+            {filteredPhotos && (
+              <span className="text-muted-foreground/60 ml-1.5">
+                ({filteredPhotos.length})
+              </span>
+            )}
+          </p>
+          <button
+            type="button"
+            onClick={() => setGuestFilter(null)}
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <XIcon className="size-3" />
+            Clear
+          </button>
+        </div>
+      )}
+
       {/* Gallery content */}
       <div className="relative px-2 pb-24">
-        {photos === undefined ? (
+        {filteredPhotos === undefined ? (
           <div className="grid grid-cols-3 gap-0.5">
             {Array.from({ length: 9 }).map((_, i) => (
               <Skeleton key={i} className="aspect-square w-full rounded-none" />
             ))}
           </div>
         ) : !hasPhotos ? (
+          guestFilter ? (
+            <div className="flex flex-col items-center justify-center py-24 px-6">
+              <CameraIcon className="size-8 text-muted-foreground/40 mb-4" />
+              <p className="text-sm text-muted-foreground text-center">
+                {filteredGuest
+                  ? `${filteredGuest.name} hasn\u2019t uploaded any photos yet`
+                  : "No photos from this guest"}
+              </p>
+            </div>
+          ) : (
           <div className="flex flex-col items-center justify-center py-24 px-6">
             <div className="flex items-center justify-center size-16 rounded-full bg-muted mb-6 animate-in fade-in zoom-in-75 duration-500">
               <HeartIcon className="size-7 text-muted-foreground" />
@@ -315,6 +375,7 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
               </div>
             )}
           </div>
+          )
         ) : (
           <div
             className={cn(
@@ -323,7 +384,7 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
                 : "flex flex-col gap-2 max-w-lg mx-auto",
             )}
           >
-            {photos.map((photo, index) =>
+            {filteredPhotos.map((photo, index) =>
               photo.url ? (
                 <div
                   key={photo._id}
@@ -404,13 +465,13 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
       </div>
 
       {/* Photo Lightbox */}
-      {hasPhotos && (
+      {hasPhotos && filteredPhotos && (
         <PhotoLightbox
-          photos={photos}
+          photos={filteredPhotos}
           selectedIndex={selectedPhotoIndex}
           onClose={handleLightboxClose}
           onNavigate={(index) => {
-            if (photos) setPhotoId(photos[index]._id);
+            if (filteredPhotos) setPhotoId(filteredPhotos[index]._id);
           }}
           eventId={event._id}
           deviceId={guest.deviceId}

@@ -235,6 +235,7 @@ export function ManageDashboard({ slug }: ManageDashboardProps) {
         onOpenChange={setGuestDrawerOpen}
         eventId={event._id}
         coupleSecret={couple.coupleSecret}
+        slug={slug}
       />
 
       {/* Edit Event Drawer */}
