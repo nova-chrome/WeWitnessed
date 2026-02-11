@@ -16,24 +16,25 @@ interface EventDateDisplayProps {
 }
 
 export function EventDateDisplay({ date }: EventDateDisplayProps) {
-  if (!date) return null;
-
-  const eventDate = new Date(date);
-  const phase = getEventPhase(eventDate);
+  // Initialize state and effects before any conditional returns
+  const eventDate = date ? new Date(date) : null;
+  const phase = eventDate ? getEventPhase(eventDate) : null;
   const [countdown, setCountdown] = useState<string>(() =>
-    calculateCountdown(eventDate),
+    eventDate ? calculateCountdown(eventDate) : "",
   );
 
   // Update countdown every second for upcoming events
   useEffect(() => {
-    if (phase !== "upcoming") return;
+    if (!eventDate || phase !== "upcoming") return;
 
     const interval = setInterval(() => {
       setCountdown(calculateCountdown(eventDate));
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [date, phase]);
+  }, [eventDate, phase]);
+
+  if (!date || !eventDate) return null;
 
   switch (phase) {
     case "upcoming":
