@@ -269,7 +269,7 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
       {/* Guest filter banner */}
       {guestFilter && (
         <div className="relative flex items-center justify-between px-4 py-2 mb-1">
-          <p className="text-sm text-muted-foreground">
+          <div className="text-sm text-muted-foreground">
             {filteredGuest ? (
               <>
                 Photos by{" "}
@@ -285,7 +285,7 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
                 ({filteredPhotos.length})
               </span>
             )}
-          </p>
+          </div>
           <button
             type="button"
             onClick={() => setGuestFilter(null)}
