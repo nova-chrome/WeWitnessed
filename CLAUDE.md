@@ -8,17 +8,13 @@ Next.js App Router + Convex + Tailwind/shadcn stack following [Bulletproof React
 
 ## Directory Guidelines
 
-See the AGENTS.md file in each directory for detailed conventions:
-
-| File | Purpose |
-| ---- | ------- |
-| `AGENTS.md` | Project architecture, state management, core principles |
-| `src/app/AGENTS.md` | App Router conventions, Server vs Client Components |
-| `src/components/AGENTS.md` | Shared UI components, Lucide icon conventions |
-| `src/features/AGENTS.md` | Feature module structure, Convex hook patterns |
-| `src/lib/AGENTS.md` | Configuration vs utilities distinction |
-| `src/utils/AGENTS.md` | Pure helpers, tryCatch error handling |
-| `convex/AGENTS.md` | Backend patterns, validation, authorization, OCC |
+- @AGENTS.md
+- @src/app/AGENTS.md
+- @src/components/AGENTS.md
+- @src/features/AGENTS.md
+- @src/lib/AGENTS.md
+- @src/utils/AGENTS.md
+- @convex/AGENTS.md
 
 ## Key Principles
 
