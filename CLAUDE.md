@@ -8,17 +8,24 @@ Next.js App Router + Convex + Tailwind/shadcn stack following [Bulletproof React
 
 ## Directory Guidelines
 
-See the AGENTS.md file in each directory for detailed conventions:
+- @AGENTS.md
+- @src/app/AGENTS.md
+- @src/components/AGENTS.md
+- @src/features/AGENTS.md
+- @src/lib/AGENTS.md
+- @src/utils/AGENTS.md
+- @convex/AGENTS.md
 
-| File | Purpose |
-| ---- | ------- |
-| `AGENTS.md` | Project architecture, state management, core principles |
-| `src/app/AGENTS.md` | App Router conventions, Server vs Client Components |
-| `src/components/AGENTS.md` | Shared UI components, Lucide icon conventions |
-| `src/features/AGENTS.md` | Feature module structure, Convex hook patterns |
-| `src/lib/AGENTS.md` | Configuration vs utilities distinction |
-| `src/utils/AGENTS.md` | Pure helpers, tryCatch error handling |
-| `convex/AGENTS.md` | Backend patterns, validation, authorization, OCC |
+## Branch Management
+
+When the user requests a new feature, bug fix, refactoring, or any implementation task:
+
+1. **Check the current branch** (injected by the `UserPromptSubmit` hook — no tool call needed).
+2. **If on `main`**: Before starting work, suggest creating a feature branch. Propose a name based on the request (e.g., `feat/dark-mode`, `fix/login-redirect`). Ask the user before creating it.
+3. **If on a branch that relates to the request**: Proceed normally — no branch action needed.
+4. **If on an unrelated branch**: Mention it and ask the user whether to switch, create a new branch, or continue on the current one.
+
+This does NOT apply to questions, research, explanations, or non-implementation requests.
 
 ## Key Principles
 
@@ -27,11 +34,20 @@ See the AGENTS.md file in each directory for detailed conventions:
 3. **Server Components by default**: Client Components only when needed
 4. **Colocate code**: Feature-specific code in features/, shared code in components/
 
+## Commands
+
+Use `/command-name` to invoke:
+
+- `/commit` - Conventional commit with approval flow
+- `/pull-request` - Create a GitHub PR from current branch
+- `/memory.save` - Save feature memory for current branch
+- `/memory.load` - Load feature memory to resume work
+- `/memory.clear` - Clear feature memory
+
 ## Skills
 
-Use `/skill-name` to invoke:
+Loaded automatically when relevant:
 
-- `/conventional-commit` - Commit message formatting
 - `/shadcn` - shadcn/ui component docs
 - `/convex-best-practices` - Convex patterns
 - `/frontend-design` - Distinctive UI design

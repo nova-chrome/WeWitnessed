@@ -76,6 +76,29 @@ export async function deletePhoto(
   await Reactions.deletePhotoReactions(ctx, photoId);
 }
 
+export async function getAllPhotoCount(
+  ctx: QueryCtx,
+  eventId: Id<"events">,
+): Promise<number> {
+  const photos = await ctx.db
+    .query("photos")
+    .withIndex("by_event", (q) => q.eq("eventId", eventId))
+    .collect();
+  return photos.length;
+}
+
+export async function getLatestActivityAt(
+  ctx: QueryCtx,
+  eventId: Id<"events">,
+): Promise<number | null> {
+  const photo = await ctx.db
+    .query("photos")
+    .withIndex("by_event", (q) => q.eq("eventId", eventId))
+    .order("desc")
+    .first();
+  return photo?.createdAt ?? null;
+}
+
 export async function getPublicPhotoCount(
   ctx: QueryCtx,
   eventId: Id<"events">,

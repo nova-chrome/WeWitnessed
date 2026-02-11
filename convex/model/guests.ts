@@ -14,6 +14,28 @@ export async function getGuestByDevice(
     .first();
 }
 
+export async function getGuestsByEvent(
+  ctx: QueryCtx,
+  eventId: Id<"events">,
+) {
+  return ctx.db
+    .query("guests")
+    .withIndex("by_event", (q) => q.eq("eventId", eventId))
+    .order("desc")
+    .collect();
+}
+
+export async function getGuestCount(
+  ctx: QueryCtx,
+  eventId: Id<"events">,
+): Promise<number> {
+  const guests = await ctx.db
+    .query("guests")
+    .withIndex("by_event", (q) => q.eq("eventId", eventId))
+    .collect();
+  return guests.length;
+}
+
 export async function createGuest(
   ctx: MutationCtx,
   eventId: Id<"events">,
