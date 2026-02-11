@@ -368,19 +368,23 @@ Let couples make their event page feel personal.
 
 ---
 
-### 4.4 Display Event Date
+### 4.4 Display Event Date ✅
 
-**What**: Show the event date on the gallery page (currently stored but not displayed).
+**Status**: Complete
 
-**Where to build**: `src/app/e/[slug]/_components/event-gallery-view.tsx` — add date display to header.
+**What was built**:
 
-**What exists**: `date` field exists on events table (optional number timestamp). `date-fns` is installed.
+- Backend: No changes needed (existing `date` field on events table)
+- Frontend: `EventDateDisplay` component in `src/features/events/components/event-date-display.tsx` with phase-based rendering
+- Utils: `getEventPhase` and `calculateCountdown` functions in `src/features/events/utils/countdown.ts`
+- Integrated into gallery header in `src/app/e/[slug]/_components/event-gallery-view.tsx`
 
-**Acceptance criteria**:
-- Date shown in gallery header below event name
-- Formatted nicely (e.g., "Saturday, May 17, 2025")
-- Only shown if date was set
-- Respects locale
+**Acceptance criteria** (all met):
+
+- Date shown in gallery header between Couple View badge and photo count
+- Phase-based display: upcoming events show live countdown ("Event starts in 2d 14h 32m"), today shows "Event today!" with pulsing icon, past events show formatted date
+- Only shown if date was set (returns null if no date)
+- Uses date-fns for formatting (PPP format: "February 9, 2025")
 
 ---
 
