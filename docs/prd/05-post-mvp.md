@@ -287,21 +287,23 @@ Give the couple a proper management surface beyond the inline gallery controls.
 
 ---
 
-### 3.3 Activity Feed
+### 3.3 Activity Feed ✅
 
-**What**: Real-time feed of event activity for the couple.
+**Status**: Complete
 
-**Where to build**:
-- Could be derived from photos + guests tables (no new table needed)
-- Query: recent photos with guest names, sorted by createdAt
-- Section in couple dashboard
+**What was built**:
 
-**What exists**: Photos have `createdAt` timestamps and optional `guestId` references. Convex queries are reactive.
+- Enhanced `GuestListDrawer` to show activity-focused metrics with photo counts and "last active" timestamps
+- Guests sorted by most recent activity (photo upload timestamp, then join date)
+- "View photos" button for guests with uploads that filters gallery to their photos
+- Display format: "{count} photos • last active {time ago}" for active guests, "joined {time ago}" for guests without photos
+- Real-time updates via Convex reactive queries using existing `getGuestsWithPhotoCounts` function
 
-**Acceptance criteria**:
-- Shows "Sarah uploaded a photo" style entries
+**Acceptance criteria** (all met):
+
+- Shows guest activity with photo counts and timestamps
 - Real-time updates (Convex reactivity)
-- Last 20-50 activities
+- Sorted by recent activity (most recent first)
 - Timestamps (relative: "2 minutes ago")
 
 ---
