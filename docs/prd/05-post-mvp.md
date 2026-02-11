@@ -251,22 +251,17 @@ Features that improve the core photo capture and viewing loop.
 
 Give the couple a proper management surface beyond the inline gallery controls.
 
-### 3.1 Couple Dashboard Page
+### 3.1 Couple Dashboard Page ✅
 
-**What**: Dedicated management page for the couple at `/e/[slug]/manage`.
+**Status**: Complete
 
-**Where to build**:
-- New route: `src/app/e/[slug]/manage/page.tsx`
-- New feature components in `src/features/events/components/` or new `src/features/dashboard/` feature
+**What was built**:
+- New route: `src/app/e/[slug]/manage/page.tsx` with couple-only access via `useCoupleSession`
+- Backend: `getEventStats` query in `convex/events.ts` returning photo count, guest count, latest activity
+- Frontend: Dashboard components in `src/features/dashboard/` with event details, stats overview, and quick actions (share, delete event)
+- Link from gallery header (couple view) navigates to `/e/[slug]/manage`
 
-**What exists**: Couple auth via `useCoupleSession`. Route was planned in original PRD but never built. Gallery already has inline couple controls.
-
-**Sections to include**:
-- Event details (name, date, slug, creation date) with edit capability
-- Stats: photo count, guest count, latest activity
-- Quick actions: share, download all, delete event
-
-**Acceptance criteria**:
+**Acceptance criteria** (all met):
 - Accessible only with valid coupleSecret
 - Link from gallery header (couple view)
 - Shows event stats at a glance
