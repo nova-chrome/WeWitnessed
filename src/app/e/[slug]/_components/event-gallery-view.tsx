@@ -6,6 +6,7 @@ import {
   HeartIcon,
   ImageIcon,
   KeyRoundIcon,
+  LayoutDashboardIcon,
   PencilIcon,
   Share2Icon,
 } from "lucide-react";
@@ -191,10 +192,17 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
 
       {/* Header */}
       <div className="relative pt-safe-or-4 px-4 pb-4">
-        {/* Couple share button */}
+        {/* Couple controls */}
         {couple.isCouple && couple.coupleSecret && (
-          <div className="absolute top-4 left-4 z-10">
+          <div className="absolute top-4 left-4 z-10 flex items-center gap-1">
             <EventShareDialog slug={slug} coupleSecret={couple.coupleSecret} />
+            <Link
+              href={`/e/${slug}/manage`}
+              className="inline-flex items-center justify-center size-8 rounded-full text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Manage event"
+            >
+              <LayoutDashboardIcon className="size-4" />
+            </Link>
           </div>
         )}
 

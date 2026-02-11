@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import * as Events from "./model/events";
+import * as Guests from "./model/guests";
 import * as Photos from "./model/photos";
 
 export const create = mutation({
@@ -122,6 +123,43 @@ export const getOgData = query({
       date: event.date,
       photoCount,
       coverPhotoUrl,
+    };
+  },
+});
+
+export const getStats = query({
+  args: {
+    eventId: v.id("events"),
+    coupleSecret: v.string(),
+  },
+  returns: v.union(
+    v.null(),
+    v.object({
+      totalPhotos: v.number(),
+      publicPhotos: v.number(),
+      hiddenPhotos: v.number(),
+      guestCount: v.number(),
+      latestActivityAt: v.union(v.number(), v.null()),
+    }),
+  ),
+  handler: async (ctx, { eventId, coupleSecret }) => {
+    const isValid = await Events.verifyCoupleSecret(ctx, eventId, coupleSecret);
+    if (!isValid) return null;
+
+    const [totalPhotos, publicPhotos, guestCount, latestActivityAt] =
+      await Promise.all([
+        Photos.getAllPhotoCount(ctx, eventId),
+        Photos.getPublicPhotoCount(ctx, eventId),
+        Guests.getGuestCount(ctx, eventId),
+        Photos.getLatestActivityAt(ctx, eventId),
+      ]);
+
+    return {
+      totalPhotos,
+      publicPhotos,
+      hiddenPhotos: totalPhotos - publicPhotos,
+      guestCount,
+      latestActivityAt,
     };
   },
 });
