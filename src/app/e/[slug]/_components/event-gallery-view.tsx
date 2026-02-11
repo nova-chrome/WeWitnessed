@@ -6,7 +6,7 @@ import {
   HeartIcon,
   ImageIcon,
   KeyRoundIcon,
-  LayoutDashboardIcon,
+  SettingsIcon,
   PencilIcon,
   Share2Icon,
 } from "lucide-react";
@@ -201,7 +201,7 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
               className="inline-flex items-center justify-center size-8 rounded-full text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Manage event"
             >
-              <LayoutDashboardIcon className="size-4" />
+              <SettingsIcon className="size-4" />
             </Link>
           </div>
         )}
