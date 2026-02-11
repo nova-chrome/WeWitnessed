@@ -2,7 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
-import { CameraIcon, ChevronRightIcon, UsersIcon } from "lucide-react";
+import { ChevronRightIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
 import {
   Drawer,
@@ -14,22 +14,21 @@ import {
 import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/convex/_generated/api";
 import type { Id } from "~/convex/_generated/dataModel";
-import { cn } from "~/lib/utils";
 
 interface GuestListDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   eventId: Id<"events">;
+  eventSlug: string;
   coupleSecret: string;
-  slug: string;
 }
 
 export function GuestListDrawer({
   open,
   onOpenChange,
   eventId,
+  eventSlug,
   coupleSecret,
-  slug,
 }: GuestListDrawerProps) {
   const guests = useQuery(
     api.guests.listByEvent,
@@ -52,7 +51,7 @@ export function GuestListDrawer({
           {guests === undefined ? (
             <div className="space-y-3">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-14 rounded-lg" />
+                <Skeleton key={i} className="h-12 rounded-lg" />
               ))}
             </div>
           ) : guests === null || guests.length === 0 ? (
@@ -65,35 +64,53 @@ export function GuestListDrawer({
             </div>
           ) : (
             <div className="divide-y divide-border rounded-lg border border-border bg-card/50">
-              {guests.map((guest) => (
-                <Link
-                  key={guest._id}
-                  href={`/e/${slug}?guest=${guest._id}`}
-                  onClick={() => onOpenChange(false)}
-                  className={cn(
-                    "flex items-center justify-between px-4 py-3 transition-colors hover:bg-foreground/5",
-                    guest.photoCount === 0 && "opacity-60",
-                  )}
-                >
-                  <div className="flex flex-col gap-0.5 min-w-0">
-                    <span className="text-sm text-foreground truncate">
-                      {guest.name}
-                    </span>
-                    <span className="text-xs text-muted-foreground/60">
-                      {guest.latestPhotoAt
-                        ? `Last photo ${formatDistanceToNow(guest.latestPhotoAt, { addSuffix: true })}`
-                        : `Joined ${formatDistanceToNow(guest.createdAt, { addSuffix: true })}`}
-                    </span>
+              {guests.map((guest) => {
+                const hasPhotos = guest.photoCount > 0;
+                const galleryUrl = `/e/${eventSlug}?guest=${guest._id}`;
+
+                return (
+                  <div
+                    key={guest._id}
+                    className="flex items-center justify-between gap-3 px-4 py-3"
+                  >
+                    <div className="flex min-w-0 flex-1 flex-col gap-1">
+                      <span className="text-sm text-foreground">
+                        {guest.name}
+                      </span>
+                      <span className="text-xs text-muted-foreground/60">
+                        {hasPhotos && guest.latestPhotoAt ? (
+                          <>
+                            {guest.photoCount}{" "}
+                            {guest.photoCount === 1 ? "photo" : "photos"} •
+                            last active{" "}
+                            {formatDistanceToNow(guest.latestPhotoAt, {
+                              addSuffix: true,
+                            })}
+                          </>
+                        ) : (
+                          <>
+                            joined{" "}
+                            {formatDistanceToNow(guest.createdAt, {
+                              addSuffix: true,
+                            })}
+                          </>
+                        )}
+                      </span>
+                    </div>
+
+                    {hasPhotos && (
+                      <Link
+                        href={galleryUrl}
+                        className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                        onClick={() => onOpenChange(false)}
+                      >
+                        View photos
+                        <ChevronRightIcon className="size-3.5" />
+                      </Link>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <CameraIcon className="size-3" />
-                      {guest.photoCount}
-                    </span>
-                    <ChevronRightIcon className="size-4 text-muted-foreground/40" />
-                  </div>
-                </Link>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
