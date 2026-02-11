@@ -2,7 +2,6 @@
 
 import { useQuery } from "convex/react";
 import {
-  CalendarIcon,
   CameraIcon,
   HeartIcon,
   ImageIcon,
@@ -12,23 +11,19 @@ import {
   Share2Icon,
   XIcon,
 } from "lucide-react";
-import { format } from "date-fns";
 import Image from "next/image";
 import { Skeleton } from "~/components/ui/skeleton";
 import Link from "next/link";
 import { useQueryState, parseAsString } from "nuqs";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { api } from "~/convex/_generated/api";
 import type { Id } from "~/convex/_generated/dataModel";
+import { EventDateDisplay } from "~/features/events/components/event-date-display";
 import { EventEditDrawer } from "~/features/events/components/event-edit-drawer";
 import { EventShareDialog } from "~/features/events/components/event-share-dialog";
 import { useCoupleSession } from "~/features/events/hooks/use-couple-session";
-import {
-  getEventPhase,
-  calculateCountdown,
-} from "~/features/events/utils/countdown";
 import { GuestNameDialog } from "~/features/guests/components/guest-name-dialog";
 import { useGuestSession } from "~/features/guests/hooks/use-guest-session";
 import { PhotoLightbox } from "~/features/photos/components/photo-lightbox";
@@ -94,24 +89,6 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
   const [showNamePrompt, setShowNamePrompt] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
-  // Event countdown state
-  const phase = event?.date ? getEventPhase(new Date(event.date)) : null;
-  const [countdown, setCountdown] = useState<string>(() =>
-    event?.date ? calculateCountdown(new Date(event.date)) : "",
-  );
-
-  // Update countdown every second for upcoming events
-  useEffect(() => {
-    if (!event?.date || phase !== "upcoming") return;
-
-    const eventDate = new Date(event.date);
-    const interval = setInterval(() => {
-      setCountdown(calculateCountdown(eventDate));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [event?.date, phase]);
-
   const selectedPhotoIndex = useMemo(() => {
     if (!photoId || !filteredPhotos) return null;
     const index = filteredPhotos.findIndex((p) => p._id === photoId);
@@ -132,37 +109,6 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
 
   function toggleViewMode() {
     setViewMode((prev) => (prev === "grid" ? "list" : "grid"));
-  }
-
-  function renderEventDate() {
-    if (!event?.date) return null;
-    const eventDate = new Date(event.date);
-
-    switch (phase) {
-      case "upcoming":
-        return (
-          <div className="flex items-center gap-1.5 text-muted-foreground text-xs tracking-wide">
-            <CalendarIcon className="size-3" />
-            <span>Event starts in {countdown}</span>
-          </div>
-        );
-      case "today":
-        return (
-          <div className="flex items-center gap-1.5 text-purple-400 text-xs tracking-wide">
-            <CalendarIcon className="size-3 animate-pulse" />
-            <span>Event today!</span>
-          </div>
-        );
-      case "past":
-        return (
-          <div className="flex items-center gap-1.5 text-muted-foreground/60 text-xs tracking-wide">
-            <CalendarIcon className="size-3" />
-            <span>{format(eventDate, "PPP")}</span>
-          </div>
-        );
-      default:
-        return null;
-    }
   }
 
   const uploadFiles = useCallback(
@@ -313,7 +259,7 @@ export function EventGalleryView({ slug }: EventGalleryViewProps) {
               Couple View
             </span>
           )}
-          {renderEventDate()}
+          <EventDateDisplay date={event?.date} />
           {photos && photos.length > 0 && (
             <p className="text-muted-foreground text-xs tracking-wide">
               {photos.length} {photos.length === 1 ? "photo" : "photos"}
