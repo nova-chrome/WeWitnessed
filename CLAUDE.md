@@ -16,6 +16,17 @@ Next.js App Router + Convex + Tailwind/shadcn stack following [Bulletproof React
 - @src/utils/AGENTS.md
 - @convex/AGENTS.md
 
+## Branch Management
+
+When the user requests a new feature, bug fix, refactoring, or any implementation task:
+
+1. **Check the current branch** (injected by the `UserPromptSubmit` hook — no tool call needed).
+2. **If on `main`**: Before starting work, suggest creating a feature branch. Propose a name based on the request (e.g., `feat/dark-mode`, `fix/login-redirect`). Ask the user before creating it.
+3. **If on a branch that relates to the request**: Proceed normally — no branch action needed.
+4. **If on an unrelated branch**: Mention it and ask the user whether to switch, create a new branch, or continue on the current one.
+
+This does NOT apply to questions, research, explanations, or non-implementation requests.
+
 ## Key Principles
 
 1. **Unidirectional flow**: shared → features → app (no cross-feature imports)
