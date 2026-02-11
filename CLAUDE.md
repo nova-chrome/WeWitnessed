@@ -23,11 +23,20 @@ Next.js App Router + Convex + Tailwind/shadcn stack following [Bulletproof React
 3. **Server Components by default**: Client Components only when needed
 4. **Colocate code**: Feature-specific code in features/, shared code in components/
 
+## Commands
+
+Use `/command-name` to invoke:
+
+- `/commit` - Conventional commit with approval flow
+- `/pull-request` - Create a GitHub PR from current branch
+- `/memory.save` - Save feature memory for current branch
+- `/memory.load` - Load feature memory to resume work
+- `/memory.clear` - Clear feature memory
+
 ## Skills
 
-Use `/skill-name` to invoke:
+Loaded automatically when relevant:
 
-- `/conventional-commit` - Commit message formatting
 - `/shadcn` - shadcn/ui component docs
 - `/convex-best-practices` - Convex patterns
 - `/frontend-design` - Distinctive UI design
