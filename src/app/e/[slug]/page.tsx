@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "~/convex/_generated/api";
 import { EventGalleryView } from "./_components/event-gallery-view";
+import { EventInstallPrompt } from "~/features/events/components/event-install-prompt";
 
 interface EventPageProps {
   params: Promise<{ slug: string }>;
@@ -31,6 +32,7 @@ export async function generateMetadata({
   return {
     title: `${event.name} | WeWitnessed`,
     description,
+    manifest: `/e/${slug}/manifest.webmanifest`,
     openGraph: {
       title: event.name,
       description,
@@ -47,6 +49,12 @@ export async function generateMetadata({
 
 export default async function EventPage({ params }: EventPageProps) {
   const { slug } = await params;
+  const event = await fetchQuery(api.events.getBySlug, { slug });
 
-  return <EventGalleryView slug={slug} />;
+  return (
+    <>
+      {event && <EventInstallPrompt eventName={event.name} />}
+      <EventGalleryView slug={slug} />
+    </>
+  );
 }

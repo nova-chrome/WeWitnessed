@@ -71,7 +71,11 @@ export async function deletePhoto(
     });
   }
 
-  await ctx.storage.delete(photo.storageId);
+  try {
+    await ctx.storage.delete(photo.storageId);
+  } catch {
+    // Storage file might already be deleted - continue anyway
+  }
   await ctx.db.delete(photoId);
   await Reactions.deletePhotoReactions(ctx, photoId);
 }
