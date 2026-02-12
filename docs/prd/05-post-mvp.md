@@ -15,11 +15,13 @@ Small improvements to tighten the existing MVP before adding new features.
 **Status**: Complete
 
 **What was built**:
+
 - Backend: `updateEvent` helper in `convex/model/events.ts` + `update` mutation in `convex/events.ts`
 - Frontend: `EventEditDialog` in `src/features/events/components/event-edit-dialog.tsx` (TanStack Form + Zod + Calendar + sonner toasts)
 - Pencil icon button in gallery header (couple view only) opens the edit dialog
 
 **Acceptance criteria** (all met):
+
 - Couple can edit event name and date from the gallery page
 - Requires valid coupleSecret (verified in model layer)
 - Changes reflect immediately (Convex reactivity)
@@ -32,11 +34,13 @@ Small improvements to tighten the existing MVP before adding new features.
 **Status**: Complete
 
 **What was built**:
+
 - Backend: `remove` mutation in `convex/events.ts` + `deleteEvent` cascade helper in `convex/model/events.ts` (deletes storage files, photo records, guest records, then event)
 - Frontend: `EventDeleteDialog` in `src/features/events/components/event-delete-dialog.tsx` with hold-to-delete button (5-second progress bar) instead of nested AlertDialog
 - Accessible from the edit event dialog (couple view only)
 
 **Acceptance criteria** (all met):
+
 - Couple can delete event from gallery page
 - Hold-to-delete confirmation warns about permanent deletion
 - All photos removed from Convex storage
@@ -51,6 +55,7 @@ Small improvements to tighten the existing MVP before adding new features.
 **Status**: Complete
 
 **What was built**:
+
 - Role-aware empty state in `src/app/e/[slug]/_components/event-gallery-view.tsx`
 - Guest view: HeartIcon + encouraging message + animated curved arrow pointing to camera FAB
 - Couple view: HeartIcon + message + "Invite guests" button that opens EventShareDialog
@@ -58,6 +63,7 @@ Small improvements to tighten the existing MVP before adding new features.
 - Added `bounce-subtle` CSS keyframe animation in `globals.css`
 
 **Acceptance criteria** (all met):
+
 - Guest sees: encouraging message + animated arrow pointing to camera FAB
 - Couple sees: message + share button to invite guests
 - Feels warm and wedding-appropriate, not clinical
@@ -69,11 +75,13 @@ Small improvements to tighten the existing MVP before adding new features.
 **Status**: Complete
 
 **What was built**:
+
 - Backend: `getOgData` query in `convex/events.ts` returning event name, date, photo count, and latest public photo URL. Supporting helpers `getPublicPhotoCount` and `getLatestPublicPhotoUrl` in `convex/model/photos.ts`
 - Frontend: `generateMetadata` in `src/app/e/[slug]/page.tsx` using `fetchQuery` from `convex/nextjs` for dynamic title, description, OpenGraph, and Twitter card meta tags
 - Frontend: `src/app/e/[slug]/opengraph-image.tsx` generating a 1200×630 PNG with latest event photo as background, dark gradient overlay, event name, photo count, date, and WeWitnessed branding
 
 **Acceptance criteria** (all met):
+
 - Sharing `/e/{slug}` on iMessage/WhatsApp shows: event name, photo count, "WeWitnessed" branding
 - Latest public photo used as OG image background (gradient fallback when no photos)
 - Falls back gracefully if event not found
@@ -85,12 +93,14 @@ Small improvements to tighten the existing MVP before adding new features.
 **Status**: Complete
 
 **What was built**:
+
 - Installed shadcn/ui Skeleton component (`src/components/ui/skeleton.tsx`) with `bg-muted` pulse
 - Replaced diamond spinner with full-page skeleton for event loading — "W" logo + header pills + 3×3 photo grid
 - Added separate gallery skeleton for photos loading (event loaded, photos still pending)
 - Both skeletons use identical `grid grid-cols-3 gap-0.5` layout to prevent layout shift
 
 **Acceptance criteria** (all met):
+
 - Gallery shows placeholder grid (gray rectangles) while `api.photos.getByEvent` loads
 - Smooth transition from skeleton to real photos
 - No layout shift when photos appear
@@ -108,6 +118,7 @@ Small improvements to tighten the existing MVP before adding new features.
 - Exposed `retryCamera` on `useCamera` hook to allow re-requesting camera access from the UI
 
 **Acceptance criteria** (all met):
+
 - Show device-specific instructions ("Open Settings > Safari > Camera" on iOS)
 - Include a "Try Again" button that re-requests permission
 - Detect permission state via `navigator.permissions.query` if available
@@ -133,6 +144,7 @@ Features that improve the core photo capture and viewing loop.
 - Adapted `EventCameraView` to use new `GuestNameDialog` interface (no behavioral change)
 
 **Acceptance criteria** (all met):
+
 - Guest can pick one or more photos from their device gallery
 - Photos upload using the same flow as camera captures
 - Guest name prompt still triggers on first upload if not registered
@@ -190,6 +202,7 @@ Features that improve the core photo capture and viewing loop.
 **Status**: Complete
 
 **What was built**:
+
 - Backend: `reactions` table in `convex/schema.ts` with `photoId`, `eventId`, `deviceId`, `emoji`, `createdAt` and indexes `by_photo`, `by_photo_device`, `by_event`
 - Backend: `convex/reactions.ts` with `toggle`, `getByPhoto`, `getCountsByEvent` functions; business logic in `convex/model/reactions.ts`
 - Backend: Cascade-delete reactions in `convex/model/photos.ts` (photo delete) and `convex/model/events.ts` (event delete)
@@ -198,6 +211,7 @@ Features that improve the core photo capture and viewing loop.
 - Frontend: Integrated into lightbox (`photo-lightbox.tsx`) and gallery (`event-gallery-view.tsx`) in both grid and list views
 
 **Acceptance criteria** (all met):
+
 - Fixed set of 5 emoji options (heart, fire, laugh, cry, clap)
 - One reaction per guest per photo (tap again to remove)
 - Reaction count shown on photo in gallery grid
@@ -210,6 +224,7 @@ Features that improve the core photo capture and viewing loop.
 **What**: Let the couple download all event photos as a zip file.
 
 **Where to build**:
+
 - Frontend: Add "Download All" button to couple view gallery header
 - Use client-side zip generation (e.g., JSZip or fflate library)
 - Fetch all photo URLs from `api.photos.getByEvent`, download blobs, zip them
@@ -217,6 +232,7 @@ Features that improve the core photo capture and viewing loop.
 **What exists**: Individual photo download works in lightbox. Photo URLs come from Convex storage.
 
 **Acceptance criteria**:
+
 - Couple-only (requires coupleSecret)
 - Progress indicator during download/zip
 - Zip file named `{event-name}-photos.zip`
@@ -230,6 +246,7 @@ Features that improve the core photo capture and viewing loop.
 **What**: Auto-cycling full-screen photo slideshow for projecting at the reception.
 
 **Where to build**:
+
 - New route: `/e/[slug]/slideshow` or modal overlay on gallery
 - Subscribe to `api.photos.getByEvent` for real-time updates (new photos appear live)
 - Configurable interval (5s, 10s, 15s)
@@ -237,6 +254,7 @@ Features that improve the core photo capture and viewing loop.
 **What exists**: Photo lightbox has full-screen display and arrow navigation. Convex queries are reactive.
 
 **Acceptance criteria**:
+
 - Full-screen, no UI chrome (clean for projection)
 - Auto-advances every N seconds
 - New photos appear in rotation without page refresh (Convex reactivity)
@@ -256,12 +274,14 @@ Give the couple a proper management surface beyond the inline gallery controls.
 **Status**: Complete
 
 **What was built**:
+
 - New route: `src/app/e/[slug]/manage/page.tsx` with couple-only access via `useCoupleSession`
 - Backend: `getEventStats` query in `convex/events.ts` returning photo count, guest count, latest activity
 - Frontend: Dashboard components in `src/features/dashboard/` with event details, stats overview, and quick actions (share, delete event)
 - Link from gallery header (couple view) navigates to `/e/[slug]/manage`
 
 **Acceptance criteria** (all met):
+
 - Accessible only with valid coupleSecret
 - Link from gallery header (couple view)
 - Shows event stats at a glance
@@ -274,12 +294,14 @@ Give the couple a proper management surface beyond the inline gallery controls.
 **Status**: Complete
 
 **What was built**:
+
 - Backend: `getGuestsWithPhotoCounts` in `convex/model/guests.ts` fetches guests + photos in parallel, computes per-guest photo count and latest activity timestamp
 - Backend: Updated `listByEvent` query in `convex/guests.ts` to return enriched guest data; added `getById` query for guest name lookups
 - Frontend: Enhanced `GuestListDrawer` in couple dashboard with photo counts, activity timestamps, and tappable rows linking to filtered gallery
 - Frontend: Added `?guest=<id>` URL param filtering to gallery via nuqs with filter banner and clear button
 
 **Acceptance criteria** (all met):
+
 - List of guest names with photo count per guest
 - Sorted by most recent activity
 - Tapping a guest filters gallery to their photos
@@ -317,6 +339,7 @@ Let couples make their event page feel personal.
 **What**: Let the couple pick a color accent for their event page.
 
 **Where to build**:
+
 - Backend: Add `theme` (optional string) field to events table
 - Frontend: Color picker in event creation form (or dashboard)
 - Apply as CSS custom property to event pages
@@ -324,6 +347,7 @@ Let couples make their event page feel personal.
 **What exists**: Dark/light theme via next-themes. Tailwind CSS 4 with CSS custom properties.
 
 **Acceptance criteria**:
+
 - 6-8 preset color options (no free-form color picker)
 - Color applies to: camera FAB, buttons, accents on event page
 - Falls back to default purple if not set
@@ -336,6 +360,7 @@ Let couples make their event page feel personal.
 **What**: Let the couple set a hero photo for their event gallery page.
 
 **Where to build**:
+
 - Backend: Add `coverPhotoId` (optional Id<"photos">) to events table
 - Frontend: "Set as cover" option in lightbox (couple only)
 - Gallery page shows cover at top
@@ -343,6 +368,7 @@ Let couples make their event page feel personal.
 **What exists**: Photo lightbox with couple-only controls. Event gallery header.
 
 **Acceptance criteria**:
+
 - Couple selects any uploaded photo as cover
 - Cover displays as banner at top of gallery
 - Can be changed or removed
@@ -355,12 +381,14 @@ Let couples make their event page feel personal.
 **What**: Custom welcome text shown on the event gallery page.
 
 **Where to build**:
+
 - Backend: Add `welcomeMessage` (optional string) to events table
 - Frontend: Editable in dashboard, displayed on gallery page above photos
 
 **What exists**: Gallery header shows event name. Event creation form.
 
 **Acceptance criteria**:
+
 - Max 280 characters
 - Displayed between header and photo grid
 - Couple can edit from dashboard
@@ -399,6 +427,7 @@ Make the app work reliably at venues with poor WiFi.
 **Where to build**: See [ADR 002](../decisions/002-offline-queue.md) for the full accepted design.
 
 **Summary**:
+
 - IndexedDB storage for photo blobs via Dexie.js or idb
 - Queue schema: id, eventSlug, guestId, blob, createdAt, status, retryCount
 - Sync triggers: online event, visibility change, periodic retry
@@ -407,6 +436,7 @@ Make the app work reliably at venues with poor WiFi.
 **What exists**: ADR accepted, service worker shell at `/public/sw.js`, PWA manifest configured.
 
 **Acceptance criteria**:
+
 - Photos captured offline are stored in IndexedDB
 - Auto-sync when connection returns
 - Badge shows queued count
@@ -424,6 +454,7 @@ Make the app work reliably at venues with poor WiFi.
 **What exists**: Minimal service worker that only enables installability.
 
 **Acceptance criteria**:
+
 - Shell (HTML, CSS, JS, fonts) cached on first visit
 - App loads from cache on revisit (even offline)
 - Stale-while-revalidate for assets
@@ -491,6 +522,7 @@ These features require some form of persistent identity beyond deviceId + couple
 **Why**: Enables secret recovery, multi-event support, cross-device access, email notifications.
 
 **Considerations**:
+
 - Magic link (passwordless) keeps it simple
 - Clerk or custom email + OTP via Convex
 - Guests should never need an account
