@@ -151,7 +151,11 @@ export async function setCoverPhoto(
 
   const event = await ctx.db.get(eventId);
   if (event?.coverPhotoStorageId) {
-    await ctx.storage.delete(event.coverPhotoStorageId);
+    try {
+      await ctx.storage.delete(event.coverPhotoStorageId);
+    } catch {
+      // Storage file might already be deleted - continue anyway
+    }
   }
 
   await ctx.db.patch(eventId, { coverPhotoStorageId: storageId });
@@ -172,7 +176,11 @@ export async function removeCoverPhoto(
 
   const event = await ctx.db.get(eventId);
   if (event?.coverPhotoStorageId) {
-    await ctx.storage.delete(event.coverPhotoStorageId);
+    try {
+      await ctx.storage.delete(event.coverPhotoStorageId);
+    } catch {
+      // Storage file might already be deleted - continue anyway
+    }
     await ctx.db.patch(eventId, { coverPhotoStorageId: undefined });
   }
 }
@@ -198,7 +206,11 @@ export async function deleteEvent(
 
   await Promise.all(
     photos.map(async (photo) => {
-      await ctx.storage.delete(photo.storageId);
+      try {
+        await ctx.storage.delete(photo.storageId);
+      } catch {
+        // Storage file might already be deleted - continue anyway
+      }
       await ctx.db.delete(photo._id);
     }),
   );
