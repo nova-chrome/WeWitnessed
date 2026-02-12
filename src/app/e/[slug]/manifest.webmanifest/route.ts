@@ -23,6 +23,37 @@ export async function GET(
     return new NextResponse("Event not found", { status: 404 });
   }
 
+  // Use cover photo as icon if available, otherwise fall back to default icons
+  const icons = event.coverPhotoUrl
+    ? [
+        {
+          src: event.coverPhotoUrl,
+          sizes: "192x192",
+          type: "image/jpeg",
+          purpose: "any",
+        },
+        {
+          src: event.coverPhotoUrl,
+          sizes: "512x512",
+          type: "image/jpeg",
+          purpose: "any",
+        },
+      ]
+    : [
+        {
+          src: "/icon-192x192.svg",
+          sizes: "192x192",
+          type: "image/svg+xml",
+          purpose: "any maskable",
+        },
+        {
+          src: "/icon-512x512.svg",
+          sizes: "512x512",
+          type: "image/svg+xml",
+          purpose: "any maskable",
+        },
+      ];
+
   // Generate event-specific manifest
   const manifest = {
     name: `${event.name} - WeWitnessed`,
@@ -33,20 +64,7 @@ export async function GET(
     display: "standalone",
     background_color: "#ffffff",
     theme_color: "#000000",
-    icons: [
-      {
-        src: "/icon-192x192.svg",
-        sizes: "192x192",
-        type: "image/svg+xml",
-        purpose: "any maskable",
-      },
-      {
-        src: "/icon-512x512.svg",
-        sizes: "512x512",
-        type: "image/svg+xml",
-        purpose: "any maskable",
-      },
-    ],
+    icons,
   };
 
   return NextResponse.json(manifest, {
