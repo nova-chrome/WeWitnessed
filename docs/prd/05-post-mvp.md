@@ -431,19 +431,52 @@ Make the app work reliably at venues with poor WiFi.
 
 ---
 
-### 5.3 Install Prompt
+### 5.3 Install Prompt ✅
 
-**What**: Actively prompt guests to install the PWA when they visit an event.
+**Status**: Complete
 
-**Where to build**: Enhance `src/components/pwa-register.tsx` to capture `beforeinstallprompt` event.
+**What was built**:
 
-**What exists**: PWA manifest + service worker. `PWARegister` component in root layout.
+- `EventInstallPrompt` component in `src/features/events/components/event-install-prompt.tsx`
+- Captures `beforeinstallprompt` event for Chrome/Android native prompt
+- iOS-specific instructions (tap Share → Add to Home Screen)
+- Per-event dismissal tracking via sessionStorage
+- Lazy state initialization with `useSyncExternalStore` to prevent SSR/hydration errors
+- Integrated into event gallery page (`src/app/e/[slug]/page.tsx`)
 
-**Acceptance criteria**:
-- Banner appears on first visit (dismissable)
-- Only shows on supported browsers (Chrome, Edge, Samsung)
-- "Add to Home Screen" button
-- Doesn't show again after dismissal (localStorage flag)
+**Acceptance criteria** (all met):
+
+- Banner appears on first visit (dismissable via X button)
+- Native install prompt for Chrome, Edge, Samsung browsers
+- iOS users see step-by-step instructions instead
+- Session-scoped dismissal (per event, cleared on browser close)
+- Hidden when already installed (standalone mode detection)
+- "Install App" button triggers native installation flow
+
+---
+
+### 5.4 Per-Event PWA Installation ✅
+
+**Status**: Complete
+
+**What was built**:
+
+- Dynamic manifest generation per event (`src/app/e/[slug]/manifest.webmanifest/route.ts`)
+- Event-scoped service worker registration (scoped to `/e/{slug}/`)
+- `EventPWARegister` component (`src/components/event-pwa-register.tsx`) for per-event SW registration
+- Event cover photo as PWA icon (fallback to default icon if no cover)
+- Event-specific app name and branding in manifest
+- Each installed event is an independent PWA with its own scope
+- Fixed SSR/hydration errors with proper lazy state initialization
+
+**Acceptance criteria** (all met):
+
+- Each event can be installed as a separate PWA
+- Installed app opens directly to that event's gallery (`/e/{slug}`)
+- Event name appears as app name on home screen
+- Event cover photo (if set) used as app icon
+- Multiple events can be installed independently
+- Homepage PWA remains separate for event organizers
 
 ---
 
