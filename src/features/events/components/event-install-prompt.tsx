@@ -1,83 +1,95 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { XIcon } from 'lucide-react'
-import { Button } from '~/components/ui/button'
-import { tryCatch } from '~/utils/try-catch'
+import { XIcon } from "lucide-react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { Button } from "~/components/ui/button";
+import { tryCatch } from "~/utils/try-catch";
 
 interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
 interface EventInstallPromptProps {
-  eventName: string
+  eventName: string;
 }
+
+const getIsIOS = () =>
+  typeof window !== "undefined"
+    ? /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window)
+    : false;
+
+const getIsStandalone = () =>
+  typeof window !== "undefined"
+    ? window.matchMedia("(display-mode: standalone)").matches
+    : false;
 
 export function EventInstallPrompt({ eventName }: EventInstallPromptProps) {
   const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null)
+    useState<BeforeInstallPromptEvent | null>(null);
 
-  // Use lazy initialization to avoid setState in effect
-  const [isIOS] = useState(() =>
-    /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window),
-  )
+  const isIOS = useSyncExternalStore(
+    () => () => {},
+    getIsIOS,
+    () => false,
+  );
 
-  const [isStandalone] = useState(() =>
-    window.matchMedia('(display-mode: standalone)').matches,
-  )
+  const isStandalone = useSyncExternalStore(
+    () => () => {},
+    getIsStandalone,
+    () => false,
+  );
 
-  const [isDismissed, setIsDismissed] = useState(
-    () => sessionStorage.getItem(`install-dismissed-${eventName}`) === 'true',
-  )
+  const [isDismissed, setIsDismissed] = useState(() =>
+    typeof window !== "undefined"
+      ? sessionStorage.getItem(`install-dismissed-${eventName}`) === "true"
+      : false,
+  );
 
   useEffect(() => {
-    // Listen for install prompt (Chrome/Android)
     const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault()
-      setDeferredPrompt(e as BeforeInstallPromptEvent)
-    }
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
     return () => {
       window.removeEventListener(
-        'beforeinstallprompt',
+        "beforeinstallprompt",
         handleBeforeInstallPrompt,
-      )
-    }
-  }, [])
+      );
+    };
+  }, []);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return
+    if (!deferredPrompt) return;
 
-    deferredPrompt.prompt()
-    const { data: choice, error } = await tryCatch(deferredPrompt.userChoice)
+    deferredPrompt.prompt();
+    const { data: choice, error } = await tryCatch(deferredPrompt.userChoice);
 
     if (error) {
-      console.error('Install prompt failed:', error)
-      setDeferredPrompt(null)
-      return
+      console.error("Install prompt failed:", error);
+      setDeferredPrompt(null);
+      return;
     }
 
-    if (choice.outcome === 'accepted') {
-      console.log('User accepted the install prompt')
+    if (choice.outcome === "accepted") {
+      console.log("User accepted the install prompt");
     }
 
-    setDeferredPrompt(null)
-  }
+    setDeferredPrompt(null);
+  };
 
   const handleDismiss = () => {
-    setIsDismissed(true)
-    sessionStorage.setItem(`install-dismissed-${eventName}`, 'true')
-  }
+    setIsDismissed(true);
+    sessionStorage.setItem(`install-dismissed-${eventName}`, "true");
+  };
 
-  // Don't show if already installed or dismissed
   if (isStandalone || isDismissed) {
-    return null
+    return null;
   }
 
-  // Chrome/Android prompt
   if (deferredPrompt) {
     return (
       <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm">
@@ -100,10 +112,9 @@ export function EventInstallPrompt({ eventName }: EventInstallPromptProps) {
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
-  // iOS Safari instructions
   if (isIOS) {
     return (
       <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm">
@@ -128,8 +139,8 @@ export function EventInstallPrompt({ eventName }: EventInstallPromptProps) {
           </ol>
         </div>
       </div>
-    )
+    );
   }
 
-  return null
+  return null;
 }
